@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大乐透摇号模拟器</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #e62d41;
+            margin-bottom: 30px;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .numbers-display {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .number-group {
+            text-align: center;
+            margin: 10px;
+        }
+        
+        .number-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .number-item {
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            border-radius: 50%;
+            background-color: #e62d41;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            font-size: 16px;
+        }
+        
+        .number-item.blue {
+            background-color: #1a5ba5;
+        }
+        
+        button {
+            background-color: #e62d41;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background-color: #c12536;
+        }
+        
+        button.secondary {
+            background-color: #1a5ba5;
+        }
+        
+        button.secondary:hover {
+            background-color: #154a8a;
+        }
+        
+        .result-section {
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        
+        .winning {
+            background-color: #e8f5e9;
+            border: 2px solid #4caf50;
+        }
+        
+        .not-winning {
+            background-color: #ffebee;
+            border: 2px solid #f44336;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        
+        .batch-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        input[type="number"] {
+            width: 80px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .match-info {
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: #666;
+        }
+        
+        .rolling-number {
+            animation: rollNumber 0.5s ease-in-out;
+        }
+        
+        @keyframes rollNumber {
+            0% { transform: translateY(0); }
+            25% { transform: translateY(-5px); }
+            50% { transform: translateY(0); }
+            75% { transform: translateY(-2px); }
+            100% { transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>大发快三透摇号模拟器</h1>
+        
+        <div class="section">
+            <div class="section-title">功能选择</div>
+            <button onclick="singleDraw()">单次随机摇号</button>
+            <button class="secondary" onclick="manualInput()">手动输入号码</button>
+            <button onclick="batchDraw()">批量模拟</button>
+        </div>
+        
+        <div class="section" id="manualSection" style="display:none;">
+            <div class="section-title">手动输入号码</div>
+            <div class="input-group">
+                <label>前区号码 (5个，1-35，用空格分隔):</label>
+                <input type="text" id="frontNumbers" placeholder="例: 1 5 8 9 20">
+            </div>
+            <div class="input-group">
+                <label>后区号码 (2个，1-12，用空格分隔):</label>
+                <input type="text" id="backNumbers" placeholder="例: 3 12">
+            </div>
+            <button onclick="simulateWithManualInput()">开始模拟</button>
+        </div>
+        
+        <div class="section" id="batchSection" style="display:none;">
+            <div class="section-title">批量模拟</div>
+            <div class="input-group batch-input">
+                <label>模拟次数:</label>
+                <input type="number" id="batchCount" min="1" max="100" value="5">
+                <button onclick="performBatchDraw()">开始批量模拟</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">我的号码</div>
+            <div class="numbers-display">
+                <div class="number-group">
+                    <div>前区</div>
+                    <div class="number-list" id="myFrontNumbers"></div>
+                </div>
+                <div class="number-group">
+                    <div>后区</div>
+                    <div class="number-list" id="myBackNumbers"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">开奖号码</div>
+            <div class="numbers-display">
+                <div class="number-group">
+                    <div>前区</div>
+                    <div class="number-list" id="winFrontNumbers"></div>
+                </div>
+                <div class="number-group">
+                    <div>后区</div>
+                    <div class="number-list" id="winBackNumbers"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section match-info">
+            <div id="matchResult"></div>
+        </div>
+        
+        <div class="result-section" id="resultSection">
+            <div id="resultText"></div>
+        </div>
+    </div>
+
+    <script>
+        let myNumbers = [[], []];
+        let winningNumbers = [[], []];
+
+        function generateLotteryNumbers() {
+            // 生成前区号码 (1-35中选5个)
+            const frontPool = Array.from({length: 35}, (_, i) => i + 1);
+            const frontNumbers = shuffleArray(frontPool).slice(0, 5).sort((a, b) => a - b);
+            
+            // 生成后区号码 (1-12中选2个)
+            const backPool = Array.from({length: 12}, (_, i) => i + 1);
+            const backNumbers = shuffleArray(backPool).slice(0, 2).sort((a, b) => a - b);
+            
+            return [frontNumbers, backNumbers];
+        }
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function displayNumbers(numbers, frontElementId, backElementId) {
+            const [front, back] = numbers;
+            const frontContainer = document.getElementById(frontElementId);
+            const backContainer = document.getElementById(backElementId);
+            
+            frontContainer.innerHTML = '';
+            backContainer.innerHTML = '';
+            
+            front.forEach(num => {
+                const span = document.createElement('span');
+                span.className = 'number-item rolling-number';
+                span.textContent = num;
+                frontContainer.appendChild(span);
+            });
+            
+            back.forEach(num => {
+                const span = document.createElement('span');
+                span.className = 'number-item blue rolling-number';
+                span.textContent = num;
+                backContainer.appendChild(span);
+            });
+        }
+
+        function calculateMatches(userNumbers, winningNumbers) {
+            const [userFront, userBack] = userNumbers;
+            const [winFront, winBack] = winningNumbers;
+            
+            const frontMatches = userFront.filter(num => winFront.includes(num)).length;
+            const backMatches = userBack.filter(num => winBack.includes(num)).length;
+            
+            return { frontMatches, backMatches };
+        }
+
+        function determinePrizeLevel(frontMatches, backMatches) {
+            const prizeRules = {
+                '5,2': '一等奖',
+                '5,1': '二等奖',
+                '5,0': '三等奖',
+                '4,2': '四等奖',
+                '4,1': '五等奖',
+                '3,2': '五等奖',
+                '4,0': '六等奖',
+                '3,1': '六等奖',
+                '2,2': '六等奖',
+                '3,0': '七等奖',
+                '2,1': '七等奖',
+                '1,2': '七等奖',
+                '2,0': '八等奖',
+                '1,1': '八等奖',
+                '0,2': '八等奖',
+                '1,0': '九等奖',
+                '0,1': '九等奖'
+            };
+            
+            const key = `${frontMatches},${backMatches}`;
+            return prizeRules[key] || '未中奖';
+        }
+
+        function singleDraw() {
+            hideSections();
+            myNumbers = generateLotteryNumbers();
+            updateDisplay();
+            setTimeout(drawWinningNumbers, 1000);
+        }
+
+        function manualInput() {
+            hideSections();
+            document.getElementById('manualSection').style.display = 'block';
+        }
+
+        function simulateWithManualInput() {
+            const frontInput = document.getElementById('frontNumbers').value.trim();
+            const backInput = document.getElementById('backNumbers').value.trim();
+            
+            if (!frontInput || !backInput) {
+                alert('请输入完整的号码！');
+                return;
+            }
+            
+            const frontNumbers = frontInput.split(/\s+/).map(Number);
+            const backNumbers = backInput.split(/\s+/).map(Number);
+            
+            if (frontNumbers.length !== 5 || backNumbers.length !== 2) {
+                alert('号码数量不正确！前区应为5个，后区应为2个');
+                return;
+            }
+            
+            if (!frontNumbers.every(n => n >= 1 && n <= 35) || !backNumbers.every(n => n >= 1 && n <= 12)) {
+                alert('号码超出范围！前区应在1-35之间，后区应在1-12之间');
+                return;
+            }
+            
+            myNumbers = [frontNumbers.sort((a, b) => a - b), backNumbers.sort((a, b) => a - b)];
+            updateDisplay();
+            setTimeout(drawWinningNumbers, 1000);
+        }
+
+        function batchDraw() {
+            hideSections();
+            document.getElementById('batchSection').style.display = 'block';
+        }
+
+        function performBatchDraw() {
+            const count = parseInt(document.getElementById('batchCount').value);
+            
+            if (isNaN(count) || count <= 0 || count > 100) {
+                alert('请输入1-100之间的数字');
+                return;
+            }
+            
+            // 隐藏所有其他部分，显示加载状态
+            hideSections();
+            document.getElementById('matchResult').innerHTML = '<div class="loading">正在批量模拟中...</div>';
+            
+            // 执行批量模拟
+            setTimeout(() => {
+                let wins = 0;
+                let results = [];
+                
+                for (let i = 0; i < count; i++) {
+                    myNumbers = generateLotteryNumbers();
+                    winningNumbers = generateLotteryNumbers();
+                    
+                    const matches = calculateMatches(myNumbers, winningNumbers);
+                    const prize = determinePrizeLevel(matches.frontMatches, matches.backMatches);
+                    
+                    if (prize !== '未中奖') {
+                        wins++;
+                    }
+                    
+                    results.push({
+                        round: i + 1,
+                        front: myNumbers[0].join(','),
+                        back: myNumbers[1].join(','),
+                        matches: `前区${matches.frontMatches}个, 后区${matches.backMatches}个`,
+                        prize: prize
+                    });
+                }
+                
+                // 显示汇总结果
+                let resultHTML = `<h3>批量模拟结果 (${count}次)</h3>`;
+                resultHTML += `<p>中奖次数: ${wins}</p>`;
+                resultHTML += `<p>中奖率: ${(wins/count*100).toFixed(2)}%</p>`;
+                resultHTML += '<details><summary>详细结果</summary><ul>';
+                
+                results.forEach(r => {
+                    resultHTML += `<li>第${r.round}次: 前区[${r.front}] 后区[${r.back}] 匹配[${r.matches}] ${r.prize}</li>`;
+                });
+                
+                resultHTML += '</ul></details>';
+                
+                document.getElementById('matchResult').innerHTML = resultHTML;
+            }, 1000);
+        }
+
+        function drawWinningNumbers() {
+            // 添加摇号效果
+            document.getElementById('winFrontNumbers').innerHTML = '<div class="loading">开奖中...</div>';
+            document.getElementById('winBackNumbers').innerHTML = '<div class="loading">开奖中...</div>';
+            
+            // 暂停一下，然后显示开奖号码
+            setTimeout(() => {
+                winningNumbers = generateLotteryNumbers();
+                displayNumbers(winningNumbers, 'winFrontNumbers', 'winBackNumbers');
+                showResults();
+            }, 1500);
+        }
+
+        function updateDisplay() {
+            displayNumbers(myNumbers, 'myFrontNumbers', 'myBackNumbers');
+            // 如果开奖号码已经存在，则也更新它们
+            if (winningNumbers[0].length > 0 && winningNumbers[1].length > 0) {
+                displayNumbers(winningNumbers, 'winFrontNumbers', 'winBackNumbers');
+            }
+        }
+
+        function showResults() {
+            const matches = calculateMatches(myNumbers, winningNumbers);
+            const prize = determinePrizeLevel(matches.frontMatches, matches.backMatches);
+            
+            document.getElementById('matchResult').innerHTML = `
+                <p>前区匹配 ${matches.frontMatches} 个</p>
+                <p>后区匹配 ${matches.backMatches} 个</p>
+            `;
+            
+            const resultSection = document.getElementById('resultSection');
+            if (prize !== '未中奖') {
+                resultSection.className = 'result-section winning';
+                document.getElementById('resultText').innerHTML = `<h3>🎉 恭喜您获得: ${prize} 🎉</h3>`;
+            } else {
+                resultSection.className = 'result-section not-winning';
+                document.getElementById('resultText').innerHTML = '<h3>很遗憾，未中奖，请再接再厉！</h3>';
+            }
+        }
+
+        function hideSections() {
+            document.getElementById('manualSection').style.display = 'none';
+            document.getElementById('batchSection').style.display = 'none';
+        }
+
+        // 初始化页面
+        window.onload = function() {
+            // 生成初始随机号码
+            myNumbers = generateLotteryNumbers();
+            updateDisplay();
+        };
+    </script>
+</body>
+</html>

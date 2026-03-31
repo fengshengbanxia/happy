@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大乐透模拟摇号机 - 真实版</title>
+    <style>
+        :root {
+            --red-ball-bg: radial-gradient(circle at 30% 30%, #ff7b7b, #c00000);
+            --blue-ball-bg: radial-gradient(circle at 30% 30%, #7b9fff, #0033cc);
+            --ball-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .machine-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 900px;
+            width: 90%;
+            margin-bottom: 30px;
+        }
+
+        .balls-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            min-height: 60px;
+        }
+
+        .ball {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            box-shadow: var(--ball-shadow);
+            border: 2px solid rgba(255,255,255,0.3);
+            user-select: none;
+            transition: all 0.3s;
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        .ball.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .ball.red {
+            background: var(--red-ball-bg);
+        }
+
+        .ball.blue {
+            background: var(--blue-ball-bg);
+        }
+
+        .ball.rolling {
+            animation: shake 0.1s infinite;
+            filter: blur(0.5px);
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        @keyframes shake {
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-2px) scale(1); }
+            100% { transform: translateY(0) scale(1); }
+        }
+
+        .ball.final {
+            animation: popIn 0.4s ease-out;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        button {
+            padding: 12px 40px;
+            font-size: 18px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            outline: none;
+        }
+
+        #action-btn {
+            background: linear-gradient(45deg, #ff512f, #dd2476);
+            color: white;
+            box-shadow: 0 4px 15px rgba(221, 36, 118, 0.4);
+        }
+
+        #action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(221, 36, 118, 0.6);
+        }
+
+        #action-btn:active {
+            transform: translateY(1px);
+        }
+
+        #action-btn.stop-mode {
+            background: linear-gradient(45deg, #11998e, #38ef7d);
+            box-shadow: 0 4px 15px rgba(56, 239, 125, 0.4);
+        }
+
+        #sort-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
+        }
+
+        #sort-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(118, 75, 162, 0.6);
+        }
+
+        #sort-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .order-label {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .order-label.highlight {
+            color: #ff512f;
+            font-weight: bold;
+        }
+
+        .label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .divider {
+            height: 1px;
+            background: #eee;
+            margin: 30px 0;
+        }
+
+        /* 批量摇号区域 */
+        .batch-section {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 900px;
+            width: 90%;
+            display: none;
+        }
+
+        .batch-section.show {
+            display: block;
+        }
+
+        .batch-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .batch-header h2 {
+            margin: 0;
+            color: #333;
+        }
+
+        .batch-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .batch-actions button {
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+
+        #copy-btn {
+            background: linear-gradient(45deg, #11998e, #38ef7d);
+            color: white;
+        }
+
+        #export-btn {
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            color: white;
+        }
+
+        #clear-batch-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .result-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .result-item:hover {
+            background: #e9ecef;
+        }
+
+        .result-index {
+            font-weight: bold;
+            color: #667eea;
+            min-width: 60px;
+            text-align: left;
+        }
+
+        .result-balls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .result-balls .ball {
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+        }
+
+        .result-text {
+            font-family: monospace;
+            color: #333;
+            background: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .input-group input {
+            width: 80px;
+            padding: 10px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .input-group input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .mode-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .mode-tab {
+            padding: 10px 30px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .mode-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .mode-tab:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .sequence-info {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #856404;
+        }
+
+        @media (max-width: 600px) {
+            .ball {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .batch-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🎰 超级大乐透模拟摇号机</h1>
+    <div class="subtitle">真实模拟摇奖机 - 号码按摇出顺序显示</div>
+
+    <!-- 单组摇号区域 -->
+    <div class="machine-container">
+        <div class="mode-tabs">
+            <div class="mode-tab active" onclick="switchMode('single')">单组摇号</div>
+            <div class="mode-tab" onclick="switchMode('batch')">批量摇号</div>
+        </div>
+
+        <div class="sequence-info">
+            💡 <strong>提示：</strong>号码按照真实摇出顺序显示（乱序），点击"排序"按钮可查看排序后的号码
+        </div>
+
+        <div class="section">
+            <span class="label order-label" id="red-label">前区摇出顺序 (1-35)</span>
+            <div class="balls-row" id="red-balls-container"></div>
+        </div>
+
+        <div class="section">
+            <span class="label order-label" id="blue-label">后区摇出顺序 (1-12)</span>
+            <div class="balls-row" id="blue-balls-container"></div>
+        </div>
+
+        <div class="controls">
+            <button id="action-btn" onclick="toggleLottery()">开始摇号</button>
+            <button id="sort-btn" onclick="sortBalls()" disabled>排序显示</button>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 批量摇号区域 -->
+    <div class="batch-section" id="batch-section">
+        <div class="batch-header">
+            <h2>📋 批量摇号结果</h2>
+            <div class="batch-actions">
+                <button id="copy-btn" onclick="copyAllResults()">复制全部</button>
+                <button id="export-btn" onclick="exportCSV()">导出CSV</button>
+                <button id="clear-batch-btn" onclick="clearBatchResults()">清空</button>
+            </div>
+        </div>
+        <div class="controls" style="margin-bottom: 20px;">
+            <div class="input-group">
+                <label>生成组数：</label>
+                <input type="number" id="batch-count" value="5" min="1" max="100">
+            </div>
+            <button id="batch-btn" onclick="startBatchLottery()">批量生成</button>
+        </div>
+        <div id="batch-results-list"></div>
+    </div>
+
+    <script>
+        // 配置
+        const RED_COUNT = 5;
+        const RED_MAX = 35;
+        const BLUE_COUNT = 2;
+        const BLUE_MAX = 12;
+        const ROLL_SPEED = 50;
+        const STOP_DELAY = 400;
+
+        let isRunning = false;
+        let timers = [];
+        let redBalls = [];
+        let blueBalls = [];
+        let currentRedNumbers = [];
+        let currentBlueNumbers = [];
+        let isSorted = false;
+        let batchResults = [];
+        let currentMode = 'single';
+
+        // 初始化
+        function init() {
+            const redContainer = document.getElementById('red-balls-container');
+            const blueContainer = document.getElementById('blue-balls-container');
+
+            for (let i = 0; i < RED_COUNT; i++) {
+                const ball = document.createElement('div');
+                ball.className = 'ball red';
+                ball.innerText = '--';
+                redContainer.appendChild(ball);
+                redBalls.push(ball);
+            }
+
+            for (let i = 0; i < BLUE_COUNT; i++) {
+                const ball = document.createElement('div');
+                ball.className = 'ball blue';
+                ball.innerText = '--';
+                blueContainer.appendChild(ball);
+                blueBalls.push(ball);
+            }
+        }
+
+        // 切换模式
+        function switchMode(mode) {
+            currentMode = mode;
+            const tabs = document.querySelectorAll('.mode-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            if (mode === 'single') {
+                tabs[0].classList.add('active');
+                document.getElementById('batch-section').classList.remove('show');
+            } else {
+                tabs[1].classList.add('active');
+                document.getElementById('batch-section').classList.add('show');
+            }
+        }
+
+        function getRandomNum(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // 生成不重复的随机号码（不排序 - 真实摇出顺序）
+        function generateNumbersUnsorted(count, max) {
+            const nums = new Set();
+            while(nums.size < count) {
+                nums.add(getRandomNum(1, max));
+            }
+            // 转为数组，但不排序 - 保持随机顺序
+            return Array.from(nums);
+        }
+
+        // 生成排序后的号码
+        function generateNumbersSorted(count, max) {
+            const nums = new Set();
+            while(nums.size < count) {
+                nums.add(getRandomNum(1, max));
+            }
+            // 转为数组并排序
+            return Array.from(nums).sort((a, b) => a - b);
+        }
+
+        function formatNum(num) {
+            return num < 10 ? '0' + num : num;
+        }
+
+        // 单组摇号
+        function toggleLottery() {
+            const btn = document.getElementById('action-btn');
+            const sortBtn = document.getElementById('sort-btn');
+
+            if (!isRunning) {
+                // === 开始摇号 ===
+                isRunning = true;
+                isSorted = false;
+                btn.innerText = "停止";
+                btn.classList.add('stop-mode');
+                sortBtn.disabled = true;
+
+                // 重置标签
+                document.getElementById('red-label').innerText = '前区摇出顺序 (1-35)';
+                document.getElementById('blue-label').innerText = '后区摇出顺序 (1-12)';
+                document.getElementById('red-label').classList.remove('highlight');
+                document.getElementById('blue-label').classList.remove('highlight');
+
+                // 重置所有球
+                [...redBalls, ...blueBalls].forEach(ball => {
+                    ball.className = 'ball ' + (ball.classList.contains('red') ? 'red' : 'blue');
+                    ball.innerText = '--';
+                    ball.classList.add('rolling');
+                });
+
+                const allBalls = [...redBalls, ...blueBalls];
+                
+                allBalls.forEach((ball, index) => {
+                    const isRed = index < RED_COUNT;
+                    const max = isRed ? RED_MAX : BLUE_MAX;
+
+                    const timer = setInterval(() => {
+                        ball.innerText = formatNum(getRandomNum(1, max));
+                    }, ROLL_SPEED);
+                    timers.push(timer);
+                });
+
+            } else {
+                // === 停止摇号 ===
+                isRunning = false;
+                btn.innerText = "开始摇号";
+                btn.classList.remove('stop-mode');
+                sortBtn.disabled = false;
+
+                // 生成最终号码（不排序 - 真实摇出顺序）
+                currentRedNumbers = generateNumbersUnsorted(RED_COUNT, RED_MAX);
+                currentBlueNumbers = generateNumbersUnsorted(BLUE_COUNT, BLUE_MAX);
+                
+                const allBalls = [...redBalls, ...blueBalls];
+                const allNumbers = [...currentRedNumbers, ...currentBlueNumbers];
+
+                // 清除所有跳动定时器
+                timers.forEach(timer => clearInterval(timer));
+                timers = [];
+
+                // 依次停止每个球（真实摇出顺序）
+                allBalls.forEach((ball, index) => {
+                    setTimeout(() => {
+                        ball.classList.remove('rolling');
+                        ball.classList.add('final', 'show');
+                        ball.innerText = formatNum(allNumbers[index]);
+                        
+                        // 更新标签
+                        if (index === RED_COUNT - 1) {
+                            setTimeout(() => {
+                                document.getElementById('red-label').innerText = 
+                                    `前区摇出顺序：${currentRedNumbers.map(formatNum).join(' ')}`;
+                                document.getElementById('red-label').classList.add('highlight');
+                            }, 200);
+                        }
+                        if (index === RED_COUNT + BLUE_COUNT - 1) {
+                            setTimeout(() => {
+                                document.getElementById('blue-label').innerText = 
+                                    `后区摇出顺序：${currentBlueNumbers.map(formatNum).join(' ')}`;
+                                document.getElementById('blue-label').classList.add('highlight');
+                            }, 200);
+                        }
+                    }, index * STOP_DELAY);
+                });
+            }
+        }
+
+        // 排序显示
+        function sortBalls() {
+            if (currentRedNumbers.length === 0) return;
+
+            isSorted = true;
+            const sortedReds = [...currentRedNumbers].sort((a, b) => a - b);
+            const sortedBlues = [...currentBlueNumbers].sort((a, b) => a - b);
+
+            // 更新红球显示
+            redBalls.forEach((ball, index) => {
+                ball.classList.remove('final');
+                setTimeout(() => {
+                    ball.innerText = formatNum(sortedReds[index]);
+                    ball.classList.add('final');
+                }, index * 100);
+            });
+
+            // 更新蓝球显示
+            blueBalls.forEach((ball, index) => {
+                ball.classList.remove('final');
+                setTimeout(() => {
+                    ball.innerText = formatNum(sortedBlues[index]);
+                    ball.classList.add('final');
+                }, (RED_COUNT + index) * 100);
+            });
+
+            // 更新标签
+            setTimeout(() => {
+                document.getElementById('red-label').innerText = 
+                    `前区（已排序）：${sortedReds.map(formatNum).join(' ')}`;
+                document.getElementById('red-label').classList.remove('highlight');
+                document.getElementById('blue-label').innerText = 
+                    `后区（已排序）：${sortedBlues.map(formatNum).join(' ')}`;
+                document.getElementById('blue-label').classList.remove('highlight');
+            }, 300);
+        }
+
+        // 批量摇号
+        function startBatchLottery() {
+            const countInput = document.getElementById('batch-count');
+            let count = parseInt(countInput.value);
+            
+            if (isNaN(count) || count < 1) {
+                alert('请输入有效的组数（1-100）');
+                return;
+            }
+            
+            if (count > 100) {
+                count = 100;
+                countInput.value = 100;
+            }
+
+            batchResults = [];
+            const resultsList = document.getElementById('batch-results-list');
+            resultsList.innerHTML = '';
+
+            // 生成所有号码（不排序 - 真实顺序）
+            for (let i = 0; i < count; i++) {
+                const reds = generateNumbersUnsorted(RED_COUNT, RED_MAX);
+                const blues = generateNumbersUnsorted(BLUE_COUNT, BLUE_MAX);
+                batchResults.push({ reds, blues });
+            }
+
+            // 依次显示结果
+            batchResults.forEach((result, index) => {
+                setTimeout(() => {
+                    const item = document.createElement('div');
+                    item.className = 'result-item';
+                    
+                    const redsStr = result.reds.map(formatNum).join(' ');
+                    const bluesStr = result.blues.map(formatNum).join(' ');
+                    const sortedReds = [...result.reds].sort((a, b) => a - b).map(formatNum).join(' ');
+                    const sortedBlues = [...result.blues].sort((a, b) => a - b).map(formatNum).join(' ');
+
+                    item.innerHTML = `
+                        <div class="result-index">第${index + 1}组</div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 12px; color: #999; margin-bottom: 5px;">摇出顺序：${redsStr} + ${bluesStr}</div>
+                            <div style="font-size: 12px; color: #667eea; font-weight: bold;">排序后：${sortedReds} + ${sortedBlues}</div>
+                        </div>
+                        <div class="result-balls">
+                            ${result.reds.map(n => `<div class="ball red">${formatNum(n)}</div>`).join('')}
+                            ${result.blues.map(n => `<div class="ball blue">${formatNum(n)}</div>`).join('')}
+                        </div>
+                    `;
+                    
+                    resultsList.appendChild(item);
+                    resultsList.scrollTop = resultsList.scrollHeight;
+                }, index * 200);
+            });
+
+            document.getElementById('batch-section').classList.add('show');
+        }
+
+        // 复制全部结果
+        function copyAllResults() {
+            if (batchResults.length === 0) {
+                alert('先生成批量号码再复制');
+                return;
+            }
+
+            const text = batchResults.map((result, index) => {
+                const reds = result.reds.map(formatNum).join(' ');
+                const blues = result.blues.map(formatNum).join(' ');
+                const sortedReds = [...result.reds].sort((a, b) => a - b).map(formatNum).join(' ');
+                const sortedBlues = [...result.blues].sort((a, b) => a - b).map(formatNum).join(' ');
+                return `第${index + 1}组：\n  摇出顺序：${reds} + ${blues}\n  排序后：${sortedReds} + ${sortedBlues}`;
+            }).join('\n');
+
+            navigator.clipboard.writeText(text).then(() => {
+                alert('已复制到剪贴板！');
+            }).catch(() => {
+                alert('复制失败，请手动选择复制');
+            });
+        }
+
+        // 导出CSV
+        function exportCSV() {
+            if (batchResults.length === 0) {
+                alert('先生成批量号码再导出');
+                return;
+            }
+
+            let csv = '组别,摇出顺序-红球1,红球2,红球3,红球4,红球5,蓝球1,蓝球2,排序后-红球1,红球2,红球3,红球4,红球5,蓝球1,蓝球2\n';
+            
+            batchResults.forEach((result, index) => {
+                const sortedReds = [...result.reds].sort((a, b) => a - b);
+                const sortedBlues = [...result.blues].sort((a, b) => a - b);
+                
+                const row = [
+                    index + 1,
+                    ...result.reds.map(formatNum),
+                    ...result.blues.map(formatNum),
+                    ...sortedReds.map(formatNum),
+                    ...sortedBlues.map(formatNum)
+                ].join(',');
+                csv += row + '\n';
+            });
+
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `大乐透批量号码_${new Date().getTime()}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 清空批量结果
+        function clearBatchResults() {
+            batchResults = [];
+            document.getElementById('batch-results-list').innerHTML = '';
+        }
+
+        init();
+    </script>
+</body>
+</html>
+
