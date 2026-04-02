@@ -5,203 +5,576 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>大乐透摇号模拟器</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Arial', sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px;
-            background-color: #f5f5f5;
             color: #333;
         }
         
         .container {
-            background-color: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
         
         h1 {
             text-align: center;
-            color: #e62d41;
-            margin-bottom: 30px;
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 35px;
+            font-size: 14px;
         }
         
         .section {
             margin-bottom: 25px;
-            padding: 15px;
-            border: 1px solid #eee;
-            border-radius: 5px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            border: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
         
         .section-title {
             font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #333;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
         }
         
         .numbers-display {
             display: flex;
             justify-content: space-around;
-            margin: 15px 0;
+            margin: 20px 0;
             flex-wrap: wrap;
+            gap: 30px;
         }
         
         .number-group {
             text-align: center;
-            margin: 10px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .number-group-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
         .number-list {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 8px;
-            margin-top: 10px;
+            gap: 12px;
+            margin-top: 15px;
         }
         
         .number-item {
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
+            width: 52px;
+            height: 52px;
+            line-height: 52px;
             border-radius: 50%;
-            background-color: #e62d41;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
             color: white;
             font-weight: bold;
             text-align: center;
-            font-size: 16px;
+            font-size: 17px;
+            box-shadow: 0 4px 15px rgba(238, 90, 82, 0.4);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .number-item::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .number-item:hover::before {
+            opacity: 1;
         }
         
         .number-item.blue {
-            background-color: #1a5ba5;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
         
         button {
-            background-color: #e62d41;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 5px;
+            padding: 14px 28px;
+            border-radius: 25px;
             cursor: pointer;
-            font-size: 16px;
-            margin: 5px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        button:hover::before {
+            left: 100%;
         }
         
         button:hover {
-            background-color: #c12536;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
         }
         
         button.secondary {
-            background-color: #1a5ba5;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
         }
-        
+
         button.secondary:hover {
-            background-color: #154a8a;
+            box-shadow: 0 6px 20px rgba(17, 153, 142, 0.6);
+        }
+
+        button.copy-btn {
+            background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+            box-shadow: 0 4px 15px rgba(252, 74, 26, 0.4);
+            padding: 10px 24px;
+            font-size: 13px;
+        }
+
+        button.copy-btn:hover {
+            box-shadow: 0 6px 20px rgba(252, 74, 26, 0.6);
         }
         
         .result-section {
             text-align: center;
-            padding: 20px;
-            margin-top: 20px;
-            border-radius: 5px;
+            padding: 30px;
+            margin-top: 25px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            animation: fadeInUp 0.5s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .winning {
-            background-color: #e8f5e9;
-            border: 2px solid #4caf50;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(56, 239, 125, 0.3);
         }
         
         .not-winning {
-            background-color: #ffebee;
-            border: 2px solid #f44336;
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(235, 51, 73, 0.3);
         }
         
         .input-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 14px;
         }
         
-        input[type="text"] {
+        input[type="text"], input[type="number"] {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-sizing: border-box;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input[type="number"] {
+            width: 120px;
         }
         
         .batch-input {
             display: flex;
             align-items: center;
-            gap: 10px;
-        }
-        
-        input[type="number"] {
-            width: 80px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            gap: 15px;
+            justify-content: center;
         }
         
         .match-info {
-            margin: 15px 0;
-            padding: 10px;
-            background-color: #f9f9f9;
-            border-radius: 5px;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            color: white;
+            font-weight: 500;
         }
         
         .loading {
             text-align: center;
-            padding: 20px;
+            padding: 30px;
             font-style: italic;
             color: #666;
+            font-size: 16px;
+        }
+
+        .loading::after {
+            content: '';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
         }
         
         .rolling-number {
-            animation: rollNumber 0.5s ease-in-out;
+            animation: rollNumber 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes rollNumber {
+            0% { 
+                transform: scale(0) rotate(-180deg); 
+                opacity: 0;
+            }
+            50% { 
+                transform: scale(1.2) rotate(10deg); 
+            }
+            100% { 
+                transform: scale(1) rotate(0deg); 
+                opacity: 1;
+            }
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
         
-        @keyframes rollNumber {
-            0% { transform: translateY(0); }
-            25% { transform: translateY(-5px); }
-            50% { transform: translateY(0); }
-            75% { transform: translateY(-2px); }
-            100% { transform: translateY(0); }
+        .number-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .stat-item {
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+        
+        .stat-item.high {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-color: #f5576c;
+            animation: pulse 2s infinite;
+        }
+
+        .copy-button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        details {
+            margin-top: 15px;
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: #667eea;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        summary:hover {
+            background: #f7fafc;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+        .batch-results-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .batch-result-item {
+            display: grid;
+            grid-template-columns: 55px 1fr auto 70px;
+            gap: 10px;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .batch-result-item:hover {
+            background: #e9ecef;
+            transform: translateX(3px);
+        }
+
+        .batch-round {
+            font-weight: 600;
+            color: #667eea;
+            white-space: nowrap;
+        }
+
+        .batch-numbers {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .batch-front {
+            color: #ee5a52;
+        }
+
+        .batch-plus {
+            color: #666;
+            font-weight: bold;
+        }
+
+        .batch-back {
+            color: #4facfe;
+        }
+
+        .batch-matches {
+            color: #666;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .batch-prize {
+            white-space: nowrap;
+            min-width: 50px;
+            text-align: right;
+        }
+
+        .batch-label {
+            color: #666;
+            font-size: 12px;
+            margin-right: 4px;
+        }
+
+        .batch-label-win {
+            color: #999;
+            font-size: 12px;
+            margin-right: 4px;
+        }
+
+        .batch-front-win {
+            color: #f45c43;
+            opacity: 0.8;
+        }
+
+        .batch-back-win {
+            color: #00d4ff;
+            opacity: 0.8;
+        }
+
+        h3 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin: 5px 0;
+            font-size: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+                margin: 10px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .numbers-display {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .button-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .batch-input {
+                flex-direction: column;
+            }
+
+            input[type="number"] {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>大发快三透摇号模拟器</h1>
+        <h1>🎰 大乐透摇号模拟器</h1>
+        <p class="subtitle">体验真实的摇号乐趣 · 感受幸运的魅力</p>
         
         <div class="section">
             <div class="section-title">功能选择</div>
-            <button onclick="singleDraw()">单次随机摇号</button>
-            <button class="secondary" onclick="manualInput()">手动输入号码</button>
-            <button onclick="batchDraw()">批量模拟</button>
+            <div class="button-group">
+                <button onclick="singleDraw()">🎲 单次随机摇号</button>
+                <button class="secondary" onclick="manualInput()">✏️ 手动输入号码</button>
+                <button onclick="batchDraw()">📊 批量模拟</button>
+            </div>
         </div>
         
         <div class="section" id="manualSection" style="display:none;">
             <div class="section-title">手动输入号码</div>
             <div class="input-group">
-                <label>前区号码 (5个，1-35，用空格分隔):</label>
+                <label>前区号码 (5个，1-35，用空格分隔)</label>
                 <input type="text" id="frontNumbers" placeholder="例: 1 5 8 9 20">
             </div>
             <div class="input-group">
-                <label>后区号码 (2个，1-12，用空格分隔):</label>
+                <label>后区号码 (2个，1-12，用空格分隔)</label>
                 <input type="text" id="backNumbers" placeholder="例: 3 12">
             </div>
-            <button onclick="simulateWithManualInput()">开始模拟</button>
+            <div style="text-align: center;">
+                <button onclick="simulateWithManualInput()">开始模拟</button>
+            </div>
         </div>
         
         <div class="section" id="batchSection" style="display:none;">
             <div class="section-title">批量模拟</div>
-            <div class="input-group batch-input">
+            <div class="batch-input">
                 <label>模拟次数:</label>
                 <input type="number" id="batchCount" min="1" max="100" value="5">
                 <button onclick="performBatchDraw()">开始批量模拟</button>
@@ -212,13 +585,16 @@
             <div class="section-title">我的号码</div>
             <div class="numbers-display">
                 <div class="number-group">
-                    <div>前区</div>
+                    <div class="number-group-label">前区号码</div>
                     <div class="number-list" id="myFrontNumbers"></div>
                 </div>
                 <div class="number-group">
-                    <div>后区</div>
+                    <div class="number-group-label">后区号码</div>
                     <div class="number-list" id="myBackNumbers"></div>
                 </div>
+            </div>
+            <div class="copy-button-container">
+                <button onclick="copyMyNumbers()" class="copy-btn">📋 复制我的号码</button>
             </div>
         </div>
         
@@ -226,13 +602,16 @@
             <div class="section-title">开奖号码</div>
             <div class="numbers-display">
                 <div class="number-group">
-                    <div>前区</div>
+                    <div class="number-group-label">前区号码</div>
                     <div class="number-list" id="winFrontNumbers"></div>
                 </div>
                 <div class="number-group">
-                    <div>后区</div>
+                    <div class="number-group-label">后区号码</div>
                     <div class="number-list" id="winBackNumbers"></div>
                 </div>
+            </div>
+            <div class="copy-button-container">
+                <button onclick="copyWinningNumbers()" class="copy-btn">📋 复制开奖号码</button>
             </div>
         </div>
         
@@ -240,23 +619,54 @@
             <div id="matchResult"></div>
         </div>
         
-        <div class="result-section" id="resultSection">
+        <div class="result-section" id="resultSection" style="display:none;">
             <div id="resultText"></div>
+        </div>
+        
+        <div class="section" id="statisticsSection">
+            <div class="section-title">📈 号码统计</div>
+            <div style="text-align: center;">
+                <button onclick="showStatistics()">查看统计详情</button>
+            </div>
+            <div id="statisticsContent" style="display:none; margin-top: 20px;">
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #4a5568; margin-bottom: 10px;">前区号码出现频率</h4>
+                    <div class="number-stats" id="frontStats"></div>
+                </div>
+                <div>
+                    <h4 style="color: #4a5568; margin-bottom: 10px;">后区号码出现频率</h4>
+                    <div class="number-stats" id="backStats"></div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
         let myNumbers = [[], []];
         let winningNumbers = [[], []];
+        let batchResults = [];
+        let numberStats = {
+            front: Array(35).fill(0),
+            back: Array(12).fill(0)
+        };
+
+        function formatNumber(num) {
+            return num.toString().padStart(2, '0');
+        }
+
+        function formatNumbersForDisplay(numbers) {
+            return numbers.map(n => formatNumber(n));
+        }
 
         function generateLotteryNumbers() {
-            // 生成前区号码 (1-35中选5个)
             const frontPool = Array.from({length: 35}, (_, i) => i + 1);
             const frontNumbers = shuffleArray(frontPool).slice(0, 5).sort((a, b) => a - b);
             
-            // 生成后区号码 (1-12中选2个)
             const backPool = Array.from({length: 12}, (_, i) => i + 1);
             const backNumbers = shuffleArray(backPool).slice(0, 2).sort((a, b) => a - b);
+            
+            frontNumbers.forEach(num => numberStats.front[num - 1]++);
+            backNumbers.forEach(num => numberStats.back[num - 1]++);
             
             return [frontNumbers, backNumbers];
         }
@@ -281,14 +691,14 @@
             front.forEach(num => {
                 const span = document.createElement('span');
                 span.className = 'number-item rolling-number';
-                span.textContent = num;
+                span.textContent = formatNumber(num);
                 frontContainer.appendChild(span);
             });
             
             back.forEach(num => {
                 const span = document.createElement('span');
                 span.className = 'number-item blue rolling-number';
-                span.textContent = num;
+                span.textContent = formatNumber(num);
                 backContainer.appendChild(span);
             });
         }
@@ -330,9 +740,10 @@
 
         function singleDraw() {
             hideSections();
+            document.getElementById('resultSection').style.display = 'none';
             myNumbers = generateLotteryNumbers();
             updateDisplay();
-            setTimeout(drawWinningNumbers, 1000);
+            setTimeout(drawWinningNumbers, 800);
         }
 
         function manualInput() {
@@ -345,7 +756,7 @@
             const backInput = document.getElementById('backNumbers').value.trim();
             
             if (!frontInput || !backInput) {
-                alert('请输入完整的号码！');
+                showNotification('请输入完整的号码！', 'error');
                 return;
             }
             
@@ -353,18 +764,18 @@
             const backNumbers = backInput.split(/\s+/).map(Number);
             
             if (frontNumbers.length !== 5 || backNumbers.length !== 2) {
-                alert('号码数量不正确！前区应为5个，后区应为2个');
+                showNotification('号码数量不正确！前区应为5个，后区应为2个', 'error');
                 return;
             }
             
             if (!frontNumbers.every(n => n >= 1 && n <= 35) || !backNumbers.every(n => n >= 1 && n <= 12)) {
-                alert('号码超出范围！前区应在1-35之间，后区应在1-12之间');
+                showNotification('号码超出范围！前区应在1-35之间，后区应在1-12之间', 'error');
                 return;
             }
             
             myNumbers = [frontNumbers.sort((a, b) => a - b), backNumbers.sort((a, b) => a - b)];
             updateDisplay();
-            setTimeout(drawWinningNumbers, 1000);
+            setTimeout(drawWinningNumbers, 800);
         }
 
         function batchDraw() {
@@ -376,18 +787,16 @@
             const count = parseInt(document.getElementById('batchCount').value);
             
             if (isNaN(count) || count <= 0 || count > 100) {
-                alert('请输入1-100之间的数字');
+                showNotification('请输入1-100之间的数字', 'error');
                 return;
             }
             
-            // 隐藏所有其他部分，显示加载状态
             hideSections();
-            document.getElementById('matchResult').innerHTML = '<div class="loading">正在批量模拟中...</div>';
+            document.getElementById('matchResult').innerHTML = '<div class="loading">正在批量模拟中</div>';
             
-            // 执行批量模拟
             setTimeout(() => {
                 let wins = 0;
-                let results = [];
+                batchResults = [];
                 
                 for (let i = 0; i < count; i++) {
                     myNumbers = generateLotteryNumbers();
@@ -400,47 +809,103 @@
                         wins++;
                     }
                     
-                    results.push({
+                    batchResults.push({
                         round: i + 1,
-                        front: myNumbers[0].join(','),
-                        back: myNumbers[1].join(','),
+                        myFront: myNumbers[0].map(n => formatNumber(n)).join(' '),
+                        myBack: myNumbers[1].map(n => formatNumber(n)).join(' '),
+                        winFront: winningNumbers[0].map(n => formatNumber(n)).join(' '),
+                        winBack: winningNumbers[1].map(n => formatNumber(n)).join(' '),
                         matches: `前区${matches.frontMatches}个, 后区${matches.backMatches}个`,
                         prize: prize
                     });
                 }
                 
-                // 显示汇总结果
-                let resultHTML = `<h3>批量模拟结果 (${count}次)</h3>`;
-                resultHTML += `<p>中奖次数: ${wins}</p>`;
-                resultHTML += `<p>中奖率: ${(wins/count*100).toFixed(2)}%</p>`;
-                resultHTML += '<details><summary>详细结果</summary><ul>';
+                updateDisplay();
                 
-                results.forEach(r => {
-                    resultHTML += `<li>第${r.round}次: 前区[${r.front}] 后区[${r.back}] 匹配[${r.matches}] ${r.prize}</li>`;
+                let resultHTML = `<h3>📊 批量模拟结果 (${count}次)</h3>`;
+                resultHTML += `<p>✨ 中奖次数: <strong>${wins}</strong></p>`;
+                resultHTML += `<p>🎯 中奖率: <strong>${(wins/count*100).toFixed(2)}%</strong></p>`;
+                resultHTML += `<div class="batch-copy-buttons" style="margin-top:15px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+                    <button onclick="copyBatchMyNumbers()" class="copy-btn">📋 复制全部选号</button>
+                    <button onclick="copyBatchWinNumbers()" class="copy-btn" style="background:linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);box-shadow:0 4px 15px rgba(79,172,254,0.4);">📋 复制全部开奖号</button>
+                </div>`;
+                resultHTML += '<details open><summary>查看详细结果</summary><div class="batch-results-list">';
+                
+                batchResults.forEach(r => {
+                    const prizeColor = r.prize === '未中奖' ? '#999' : '#38ef7d';
+                    const prizeStyle = r.prize === '未中奖' ? '' : 'font-weight:600;';
+                    resultHTML += `
+                        <div class="batch-result-item">
+                            <span class="batch-round">第${r.round}次</span>
+                            <span class="batch-numbers">
+                                <div style="display:flex;flex-direction:column;gap:4px;">
+                                    <span><span class="batch-label">选号:</span><span class="batch-front">${r.myFront}</span><span class="batch-plus">+</span><span class="batch-back">${r.myBack}</span></span>
+                                    <span><span class="batch-label-win">开奖:</span><span class="batch-front-win">${r.winFront}</span><span class="batch-plus">+</span><span class="batch-back-win">${r.winBack}</span></span>
+                                </div>
+                            </span>
+                            <span class="batch-matches">${r.matches}</span>
+                            <span class="batch-prize" style="color:${prizeColor};${prizeStyle}">${r.prize}</span>
+                        </div>
+                    `;
                 });
                 
-                resultHTML += '</ul></details>';
+                resultHTML += '</div></details>';
                 
                 document.getElementById('matchResult').innerHTML = resultHTML;
-            }, 1000);
+            }, 800);
         }
 
         function drawWinningNumbers() {
-            // 添加摇号效果
-            document.getElementById('winFrontNumbers').innerHTML = '<div class="loading">开奖中...</div>';
-            document.getElementById('winBackNumbers').innerHTML = '<div class="loading">开奖中...</div>';
+            const frontContainer = document.getElementById('winFrontNumbers');
+            const backContainer = document.getElementById('winBackNumbers');
             
-            // 暂停一下，然后显示开奖号码
+            frontContainer.innerHTML = '<div class="loading">开奖中</div>';
+            backContainer.innerHTML = '<div class="loading">开奖中</div>';
+            
             setTimeout(() => {
                 winningNumbers = generateLotteryNumbers();
-                displayNumbers(winningNumbers, 'winFrontNumbers', 'winBackNumbers');
-                showResults();
-            }, 1500);
+                animateLotteryDraw(winningNumbers);
+            }, 1200);
+        }
+
+        function animateLotteryDraw(numbers) {
+            const [front, back] = numbers;
+            const frontContainer = document.getElementById('winFrontNumbers');
+            const backContainer = document.getElementById('winBackNumbers');
+            
+            frontContainer.innerHTML = '';
+            backContainer.innerHTML = '';
+            
+            let frontIndex = 0;
+            const frontInterval = setInterval(() => {
+                if (frontIndex < front.length) {
+                    const span = document.createElement('span');
+                    span.className = 'number-item rolling-number';
+                    span.textContent = formatNumber(front[frontIndex]);
+                    frontContainer.appendChild(span);
+                    frontIndex++;
+                } else {
+                    clearInterval(frontInterval);
+                }
+            }, 350);
+            
+            let backIndex = 0;
+            const backInterval = setInterval(() => {
+                if (backIndex < back.length) {
+                    const span = document.createElement('span');
+                    span.className = 'number-item blue rolling-number';
+                    span.textContent = formatNumber(back[backIndex]);
+                    backContainer.appendChild(span);
+                    backIndex++;
+                } else {
+                    clearInterval(backInterval);
+                    setTimeout(showResults, 400);
+                }
+            }, 350);
         }
 
         function updateDisplay() {
             displayNumbers(myNumbers, 'myFrontNumbers', 'myBackNumbers');
-            // 如果开奖号码已经存在，则也更新它们
             if (winningNumbers[0].length > 0 && winningNumbers[1].length > 0) {
                 displayNumbers(winningNumbers, 'winFrontNumbers', 'winBackNumbers');
             }
@@ -451,28 +916,217 @@
             const prize = determinePrizeLevel(matches.frontMatches, matches.backMatches);
             
             document.getElementById('matchResult').innerHTML = `
-                <p>前区匹配 ${matches.frontMatches} 个</p>
-                <p>后区匹配 ${matches.backMatches} 个</p>
+                <p>🔴 前区匹配: <strong>${matches.frontMatches}</strong> 个</p>
+                <p>🔵 后区匹配: <strong>${matches.backMatches}</strong> 个</p>
             `;
             
             const resultSection = document.getElementById('resultSection');
+            resultSection.style.display = 'block';
+            
             if (prize !== '未中奖') {
-                resultSection.className = 'result-section winning';
+                resultSection.className = 'result-section winning pulse-animation';
                 document.getElementById('resultText').innerHTML = `<h3>🎉 恭喜您获得: ${prize} 🎉</h3>`;
             } else {
                 resultSection.className = 'result-section not-winning';
-                document.getElementById('resultText').innerHTML = '<h3>很遗憾，未中奖，请再接再厉！</h3>';
+                document.getElementById('resultText').innerHTML = '<h3>💫 很遗憾，未中奖，请再接再厉！</h3>';
             }
         }
 
         function hideSections() {
             document.getElementById('manualSection').style.display = 'none';
             document.getElementById('batchSection').style.display = 'none';
+            document.getElementById('statisticsContent').style.display = 'none';
         }
 
-        // 初始化页面
+        function copyMyNumbers() {
+            const frontNumbers = myNumbers[0].map(n => formatNumber(n)).join(' ');
+            const backNumbers = myNumbers[1].map(n => formatNumber(n)).join(' ');
+            const textToCopy = `${frontNumbers} + ${backNumbers}`;
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showNotification('我的号码已复制到剪贴板！', 'success');
+            }).catch(err => {
+                console.error('复制失败:', err);
+                showNotification('复制失败，请手动复制', 'error');
+            });
+        }
+
+        function copyWinningNumbers() {
+            if (winningNumbers[0].length === 0 || winningNumbers[1].length === 0) {
+                showNotification('还没有开奖号码！', 'warning');
+                return;
+            }
+            const frontNumbers = winningNumbers[0].map(n => formatNumber(n)).join(' ');
+            const backNumbers = winningNumbers[1].map(n => formatNumber(n)).join(' ');
+            const textToCopy = `${frontNumbers} + ${backNumbers}`;
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showNotification('开奖号码已复制到剪贴板！', 'success');
+            }).catch(err => {
+                console.error('复制失败:', err);
+                showNotification('复制失败，请手动复制', 'error');
+            });
+        }
+
+        function copyAllBatchResults() {
+            if (batchResults.length === 0) {
+                showNotification('没有批量结果可复制！', 'warning');
+                return;
+            }
+            
+            let text = `大乐透批量模拟结果 (共${batchResults.length}次)\n`;
+            text += `${'='.repeat(50)}\n\n`;
+            
+            batchResults.forEach(r => {
+                text += `【第${r.round}次】\n`;
+                text += `选号: ${r.myFront} + ${r.myBack}\n`;
+                text += `开奖: ${r.winFront} + ${r.winBack}\n`;
+                text += `${r.matches} → ${r.prize}\n`;
+                text += '-'.repeat(40) + '\n';
+            });
+            
+            const wins = batchResults.filter(r => r.prize !== '未中奖').length;
+            text += `\n📊 统计: 中奖${wins}次, 中奖率${(wins/batchResults.length*100).toFixed(2)}%`;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification(`已复制全部${batchResults.length}条结果！`, 'success');
+            }).catch(err => {
+                console.error('复制失败:', err);
+                showNotification('复制失败，请手动复制', 'error');
+            });
+        }
+
+        function copyBatchMyNumbers() {
+            if (batchResults.length === 0) {
+                showNotification('没有选号数据可复制！', 'warning');
+                return;
+            }
+            const lines = batchResults.map(r => `${r.myFront} + ${r.myBack}`);
+            const textToCopy = lines.join('\n');
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showNotification(`已复制${batchResults.length}组选号号码！`, 'success');
+            }).catch(err => {
+                showNotification('复制失败，请手动复制', 'error');
+            });
+        }
+
+        function copyBatchWinNumbers() {
+            if (batchResults.length === 0) {
+                showNotification('没有开奖数据可复制！', 'warning');
+                return;
+            }
+            const lines = batchResults.map(r => `${r.winFront} + ${r.winBack}`);
+            const textToCopy = lines.join('\n');
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showNotification(`已复制${batchResults.length}组开奖号码！`, 'success');
+            }).catch(err => {
+                showNotification('复制失败，请手动复制', 'error');
+            });
+        }
+
+        function showStatistics() {
+            const statsContent = document.getElementById('statisticsContent');
+            if (statsContent.style.display === 'none') {
+                statsContent.style.display = 'block';
+                displayStatistics();
+            } else {
+                statsContent.style.display = 'none';
+            }
+        }
+
+        function displayStatistics() {
+            const frontStats = document.getElementById('frontStats');
+            const backStats = document.getElementById('backStats');
+            
+            frontStats.innerHTML = '';
+            backStats.innerHTML = '';
+            
+            const maxFrontCount = Math.max(...numberStats.front);
+            const maxBackCount = Math.max(...numberStats.back);
+            
+            for (let i = 0; i < 35; i++) {
+                const num = i + 1;
+                const count = numberStats.front[i];
+                const statItem = document.createElement('span');
+                statItem.className = 'stat-item' + (count === maxFrontCount && count > 0 ? ' high' : '');
+                statItem.textContent = `${formatNumber(num)}: ${count}`;
+                frontStats.appendChild(statItem);
+            }
+            
+            for (let i = 0; i < 12; i++) {
+                const num = i + 1;
+                const count = numberStats.back[i];
+                const statItem = document.createElement('span');
+                statItem.className = 'stat-item' + (count === maxBackCount && count > 0 ? ' high' : '');
+                statItem.textContent = `${formatNumber(num)}: ${count}`;
+                backStats.appendChild(statItem);
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                border-radius: 10px;
+                color: white;
+                font-weight: 500;
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            `;
+            
+            switch(type) {
+                case 'success':
+                    notification.style.background = 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)';
+                    break;
+                case 'error':
+                    notification.style.background = 'linear-gradient(135deg, #eb3349 0%, #f45c43 100%)';
+                    break;
+                case 'warning':
+                    notification.style.background = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
+                    break;
+                default:
+                    notification.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            }
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 2500);
+        }
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
         window.onload = function() {
-            // 生成初始随机号码
             myNumbers = generateLotteryNumbers();
             updateDisplay();
         };
