@@ -5,12 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>大乐透摇号模拟器</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
             min-height: 100vh;
@@ -18,7 +13,6 @@
             padding: 20px;
             color: #333;
         }
-        
         .container {
             max-width: 900px;
             margin: 0 auto;
@@ -28,7 +22,6 @@
             padding: 40px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
-        
         h1 {
             text-align: center;
             font-size: 2.8em;
@@ -40,28 +33,16 @@
             font-weight: 700;
             letter-spacing: 1px;
         }
-
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 35px;
-            font-size: 14px;
-        }
+        .subtitle { text-align: center; color: #666; margin-bottom: 35px; font-size: 14px; }
         
         .section {
             margin-bottom: 25px;
             padding: 25px;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             border-radius: 15px;
-            border: none;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-
-        .section:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        }
-        
+        .section:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); }
         .section-title {
             font-size: 18px;
             font-weight: 600;
@@ -71,7 +52,6 @@
             align-items: center;
             gap: 10px;
         }
-
         .section-title::before {
             content: '';
             width: 4px;
@@ -79,467 +59,139 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 2px;
         }
-        
-        .numbers-display {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-            flex-wrap: wrap;
-            gap: 30px;
-        }
-        
-        .number-group {
-            text-align: center;
-            flex: 1;
-            min-width: 200px;
-        }
 
-        .number-group-label {
-            font-size: 16px;
-            font-weight: 600;
-            color: #4a5568;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .number-list {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 15px;
-        }
+        .numbers-display { display: flex; justify-content: space-around; margin: 20px 0; flex-wrap: wrap; gap: 30px; }
+        .number-group { text-align: center; flex: 1; min-width: 200px; }
+        .number-group-label { font-size: 16px; font-weight: 600; color: #4a5568; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .number-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 15px; }
         
         .number-item {
-            width: 52px;
-            height: 52px;
-            line-height: 52px;
-            border-radius: 50%;
+            width: 52px; height: 52px; line-height: 52px; border-radius: 50%;
             background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-            color: white;
-            font-weight: bold;
-            text-align: center;
-            font-size: 17px;
+            color: white; font-weight: bold; text-align: center; font-size: 17px;
             box-shadow: 0 4px 15px rgba(238, 90, 82, 0.4);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            transition: all 0.3s ease; position: relative; overflow: hidden;
         }
-
         .number-item::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%); opacity: 0; transition: opacity 0.3s ease;
         }
+        .number-item:hover::before { opacity: 1; }
+        .number-item.blue { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4); }
 
-        .number-item:hover::before {
-            opacity: 1;
-        }
-        
-        .number-item.blue {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
-        }
-
-        .button-group {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        
+        .button-group { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
         button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            color: white; border: none; padding: 14px 28px; border-radius: 25px;
+            cursor: pointer; font-size: 15px; font-weight: 500;
+            transition: all 0.3s ease; position: relative; overflow: hidden;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
-
         button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
             transition: left 0.5s ease;
         }
-
-        button:hover::before {
-            left: 100%;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-        
-        button.secondary {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
-        }
-
-        button.secondary:hover {
-            box-shadow: 0 6px 20px rgba(17, 153, 142, 0.6);
-        }
-
+        button:hover::before { left: 100%; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6); }
+        button:active { transform: translateY(0); }
+        button.secondary { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4); }
+        button.secondary:hover { box-shadow: 0 6px 20px rgba(17, 153, 142, 0.6); }
         button.copy-btn {
             background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
-            box-shadow: 0 4px 15px rgba(252, 74, 26, 0.4);
-            padding: 10px 24px;
-            font-size: 13px;
+            box-shadow: 0 4px 15px rgba(252, 74, 26, 0.4); padding: 10px 24px; font-size: 13px;
         }
+        button.copy-btn:hover { box-shadow: 0 6px 20px rgba(252, 74, 26, 0.6); }
 
-        button.copy-btn:hover {
-            box-shadow: 0 6px 20px rgba(252, 74, 26, 0.6);
-        }
-        
-        .result-section {
-            text-align: center;
-            padding: 30px;
-            margin-top: 25px;
-            border-radius: 15px;
-            font-size: 18px;
-            font-weight: 600;
-            animation: fadeInUp 0.5s ease;
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .winning {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            color: white;
-            box-shadow: 0 10px 30px rgba(56, 239, 125, 0.3);
-        }
-        
-        .not-winning {
-            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
-            color: white;
-            box-shadow: 0 10px 30px rgba(235, 51, 73, 0.3);
-        }
-        
-        .input-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #4a5568;
-            font-size: 14px;
-        }
-        
+        .result-section { text-align: center; padding: 30px; margin-top: 25px; border-radius: 15px; font-size: 18px; font-weight: 600; animation: fadeInUp 0.5s ease; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .winning { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; box-shadow: 0 10px 30px rgba(56, 239, 125, 0.3); }
+        .not-winning { background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%); color: white; box-shadow: 0 10px 30px rgba(235, 51, 73, 0.3); }
+
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568; font-size: 14px; }
         input[type="text"], input[type="number"] {
-            width: 100%;
-            padding: 14px 18px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            background: white;
+            width: 100%; padding: 14px 18px; border: 2px solid #e2e8f0; border-radius: 12px;
+            font-size: 15px; transition: all 0.3s ease; background: white;
         }
+        input[type="text"]:focus, input[type="number"]:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+        input[type="number"] { width: 120px; }
+        .batch-input { display: flex; align-items: center; gap: 15px; justify-content: center; }
 
-        input[type="text"]:focus, input[type="number"]:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
+        .match-info { margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 15px; color: white; font-weight: 500; }
+        .loading { text-align: center; padding: 30px; font-style: italic; color: #666; font-size: 16px; position: relative; }
+        .loading::after { content: ''; animation: dots 1.5s infinite; position: absolute; }
+        @keyframes dots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60%, 100% { content: '...'; } }
 
-        input[type="number"] {
-            width: 120px;
-        }
-        
-        .batch-input {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            justify-content: center;
-        }
-        
-        .match-info {
-            margin: 20px 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            border-radius: 15px;
-            color: white;
-            font-weight: 500;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 30px;
-            font-style: italic;
-            color: #666;
-            font-size: 16px;
-        }
-
-        .loading::after {
-            content: '';
-            animation: dots 1.5s infinite;
-        }
-
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60%, 100% { content: '...'; }
-        }
-        
-        .rolling-number {
-            animation: rollNumber 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-
+        .rolling-number { animation: rollNumber 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
         @keyframes rollNumber {
-            0% { 
-                transform: scale(0) rotate(-180deg); 
-                opacity: 0;
-            }
-            50% { 
-                transform: scale(1.2) rotate(10deg); 
-            }
-            100% { 
-                transform: scale(1) rotate(0deg); 
-                opacity: 1;
-            }
+            0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(10deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
         }
+        .pulse-animation { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
-        .pulse-animation {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        .number-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
+        .number-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 10px; margin-top: 15px; }
         .stat-item {
-            padding: 10px;
-            background: white;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 600;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
+            padding: 10px; background: white; border-radius: 10px; font-size: 13px;
+            font-weight: 600; text-align: center; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease; border: 2px solid transparent;
         }
+        .stat-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); }
+        .stat-item.high { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-color: #f5576c; animation: pulse 2s infinite; }
 
-        .stat-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-        }
-        
-        .stat-item.high {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            border-color: #f5576c;
-            animation: pulse 2s infinite;
-        }
+        .copy-button-container { display: flex; justify-content: center; margin-top: 15px; }
+        details { margin-top: 15px; background: white; border-radius: 10px; padding: 15px; }
+        summary { cursor: pointer; font-weight: 600; color: #667eea; padding: 10px; border-radius: 8px; transition: background 0.3s ease; }
+        summary:hover { background: #f7fafc; }
 
-        .copy-button-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 15px;
-        }
-
-        details {
-            margin-top: 15px;
-            background: white;
-            border-radius: 10px;
-            padding: 15px;
-        }
-
-        summary {
-            cursor: pointer;
-            font-weight: 600;
-            color: #667eea;
-            padding: 10px;
-            border-radius: 8px;
-            transition: background 0.3s ease;
-        }
-
-        summary:hover {
-            background: #f7fafc;
-        }
-
-        ul {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        li {
-            padding: 8px 0;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 14px;
-        }
-
-        li:last-child {
-            border-bottom: none;
-        }
-
-        .batch-results-list {
-            max-height: 400px;
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-
+        .batch-results-list { max-height: 400px; overflow-y: auto; padding-right: 5px; }
         .batch-result-item {
-            display: grid;
-            grid-template-columns: 55px 1fr auto 70px;
-            gap: 10px;
-            align-items: center;
-            padding: 12px 15px;
-            margin-bottom: 8px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            font-size: 13px;
-            transition: all 0.2s ease;
+            display: grid; grid-template-columns: 55px 1fr auto 70px; gap: 10px; align-items: center;
+            padding: 12px 15px; margin-bottom: 8px; background: #f8f9fa; border-radius: 10px;
+            font-size: 13px; transition: all 0.2s ease;
         }
+        .batch-result-item:hover { background: #e9ecef; transform: translateX(3px); }
+        .batch-round { font-weight: 600; color: #667eea; white-space: nowrap; }
+        .batch-numbers { display: flex; align-items: center; gap: 6px; font-family: 'Consolas', 'Monaco', monospace; font-weight: 600; letter-spacing: 0.5px; }
+        .batch-front { color: #ee5a52; }
+        .batch-plus { color: #666; font-weight: bold; }
+        .batch-back { color: #4facfe; }
+        .batch-matches { color: #666; font-size: 12px; white-space: nowrap; }
+        .batch-prize { white-space: nowrap; min-width: 50px; text-align: right; }
+        .batch-label { color: #666; font-size: 12px; margin-right: 4px; }
+        .batch-label-win { color: #999; font-size: 12px; margin-right: 4px; }
+        .batch-front-win { color: #f45c43; opacity: 0.8; }
+        .batch-back-win { color: #00d4ff; opacity: 0.8; }
 
-        .batch-result-item:hover {
-            background: #e9ecef;
-            transform: translateX(3px);
-        }
+        h3 { color: #2d3748; margin-bottom: 10px; }
+        p { margin: 5px 0; font-size: 15px; }
 
-        .batch-round {
-            font-weight: 600;
-            color: #667eea;
-            white-space: nowrap;
-        }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { padding: 8px; text-align: left; background: #f0f0f0; }
+        td { padding: 6px; border-bottom: 1px solid #eee; }
 
-        .batch-numbers {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .batch-front {
-            color: #ee5a52;
-        }
-
-        .batch-plus {
-            color: #666;
-            font-weight: bold;
-        }
-
-        .batch-back {
-            color: #4facfe;
-        }
-
-        .batch-matches {
-            color: #666;
-            font-size: 12px;
-            white-space: nowrap;
-        }
-
-        .batch-prize {
-            white-space: nowrap;
-            min-width: 50px;
-            text-align: right;
-        }
-
-        .batch-label {
-            color: #666;
-            font-size: 12px;
-            margin-right: 4px;
-        }
-
-        .batch-label-win {
-            color: #999;
-            font-size: 12px;
-            margin-right: 4px;
-        }
-
-        .batch-front-win {
-            color: #f45c43;
-            opacity: 0.8;
-        }
-
-        .batch-back-win {
-            color: #00d4ff;
-            opacity: 0.8;
-        }
-
-        h3 {
-            color: #2d3748;
-            margin-bottom: 10px;
-        }
-
-        p {
-            margin: 5px 0;
-            font-size: 15px;
-        }
+        .hot-cold-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px; }
+        .hot-cold-card { border-radius: 12px; padding: 16px; }
+        .hot-cold-card h5 { color: white; margin-bottom: 10px; font-size: 14px; }
+        .hot-cold-numbers { display: flex; flex-wrap: wrap; gap: 6px; }
+        .hot-cold-num { padding: 4px 10px; border-radius: 6px; font-size: 13px; font-weight: 600; color: white; }
+        .hot-card-front { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%); }
+        .cold-card-front { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .hot-card-back { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .cold-card-back { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 25px;
-                margin: 10px;
-            }
-
-            h1 {
-                font-size: 2em;
-            }
-
-            .numbers-display {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .button-group {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            button {
-                width: 100%;
-            }
-
-            .batch-input {
-                flex-direction: column;
-            }
-
-            input[type="number"] {
-                width: 100%;
-            }
+            .container { padding: 25px; margin: 10px; }
+            h1 { font-size: 2em; }
+            .numbers-display { flex-direction: column; align-items: center; }
+            .button-group { flex-direction: column; align-items: stretch; }
+            button { width: 100%; }
+            .batch-input { flex-direction: column; }
+            input[type="number"] { width: 100%; }
+            .hot-cold-grid { grid-template-columns: 1fr; }
+            .batch-result-item { grid-template-columns: 1fr; gap: 5px; }
         }
     </style>
 </head>
@@ -547,7 +199,7 @@
     <div class="container">
         <h1>🎰 大乐透摇号模拟器</h1>
         <p class="subtitle">体验真实的摇号乐趣 · 感受幸运的魅力</p>
-        
+
         <div class="section">
             <div class="section-title">功能选择</div>
             <div class="button-group">
@@ -555,8 +207,38 @@
                 <button class="secondary" onclick="manualInput()">✏️ 手动输入号码</button>
                 <button onclick="batchDraw()">📊 批量模拟</button>
             </div>
+            <div class="button-group" style="margin-top:10px;">
+                <button onclick="toggleFilterSection()" style="background:linear-gradient(135deg, #f093fb 0%, #f5576c 100%);box-shadow:0 4px 15px rgba(240,147,252,0.4)">🔍 号码筛选</button>
+                <button onclick="showHistoryPanel()" style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);box-shadow:0 4px 15px rgba(102,126,234,0.4)">📜 查看历史</button>
+                <button onclick="showHotColdAnalysis()" style="background:linear-gradient(135deg, #11998e 0%, #38ef7d 100%);box-shadow:0 4px 15px rgba(17,153,142,0.4)">🔥 冷热分析</button>
+            </div>
         </div>
-        
+
+        <div class="section" id="filterSection" style="display:none;">
+            <div class="section-title">🔍 号码筛选（可选）</div>
+            <div class="input-group">
+                <label>排除前区号码（用空格分隔，最多30个）</label>
+                <input type="text" id="excludeFront" placeholder="例: 1 5 10 15 20">
+            </div>
+            <div class="input-group">
+                <label>排除后区号码（用空格分隔，最多10个）</label>
+                <input type="text" id="excludeBack" placeholder="例: 2 6">
+            </div>
+            <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+                <button onclick="applyFilter()" class="copy-btn">✅ 应用筛选</button>
+                <button onclick="clearFilter()" style="background:#999;">🗑️ 清除筛选</button>
+            </div>
+        </div>
+
+        <div class="section" id="historySection" style="display:none;">
+            <div class="section-title">📜 历史记录</div>
+            <div style="display:flex;gap:10px;margin-bottom:15px;justify-content:center;flex-wrap:wrap;">
+                <button onclick="exportHistory()" class="copy-btn">📥 导出TXT</button>
+                <button onclick="clearHistory()" style="background:#eb3349;">🗑️ 清空历史</button>
+            </div>
+            <div id="historyContent" style="max-height:300px;overflow-y:auto;"></div>
+        </div>
+
         <div class="section" id="manualSection" style="display:none;">
             <div class="section-title">手动输入号码</div>
             <div class="input-group">
@@ -567,11 +249,9 @@
                 <label>后区号码 (2个，1-12，用空格分隔)</label>
                 <input type="text" id="backNumbers" placeholder="例: 3 12">
             </div>
-            <div style="text-align: center;">
-                <button onclick="simulateWithManualInput()">开始模拟</button>
-            </div>
+            <div style="text-align:center;"><button onclick="simulateWithManualInput()">开始模拟</button></div>
         </div>
-        
+
         <div class="section" id="batchSection" style="display:none;">
             <div class="section-title">批量模拟</div>
             <div class="batch-input">
@@ -580,7 +260,7 @@
                 <button onclick="performBatchDraw()">开始批量模拟</button>
             </div>
         </div>
-        
+
         <div class="section">
             <div class="section-title">我的号码</div>
             <div class="numbers-display">
@@ -593,11 +273,9 @@
                     <div class="number-list" id="myBackNumbers"></div>
                 </div>
             </div>
-            <div class="copy-button-container">
-                <button onclick="copyMyNumbers()" class="copy-btn">📋 复制我的号码</button>
-            </div>
+            <div class="copy-button-container"><button onclick="copyMyNumbers()" class="copy-btn">📋 复制我的号码</button></div>
         </div>
-        
+
         <div class="section">
             <div class="section-title">开奖号码</div>
             <div class="numbers-display">
@@ -610,34 +288,19 @@
                     <div class="number-list" id="winBackNumbers"></div>
                 </div>
             </div>
-            <div class="copy-button-container">
-                <button onclick="copyWinningNumbers()" class="copy-btn">📋 复制开奖号码</button>
-            </div>
+            <div class="copy-button-container"><button onclick="copyWinningNumbers()" class="copy-btn">📋 复制开奖号码</button></div>
         </div>
-        
-        <div class="section match-info">
-            <div id="matchResult"></div>
-        </div>
-        
-        <div class="result-section" id="resultSection" style="display:none;">
-            <div id="resultText"></div>
-        </div>
-        
+
+        <div class="section match-info"><div id="matchResult"></div></div>
+        <div class="result-section" id="resultSection" style="display:none;"><div id="resultText"></div></div>
+
         <div class="section" id="statisticsSection">
-            <div class="section-title">📈 号码统计</div>
-            <div style="text-align: center;">
+            <div class="section-title">📈 号码统计 / 🔥 冷热分析</div>
+            <div style="text-align:center;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
                 <button onclick="showStatistics()">查看统计详情</button>
+                <button onclick="showHotColdAnalysis()" class="copy-btn">🔥 冷热分析</button>
             </div>
-            <div id="statisticsContent" style="display:none; margin-top: 20px;">
-                <div style="margin-bottom: 20px;">
-                    <h4 style="color: #4a5568; margin-bottom: 10px;">前区号码出现频率</h4>
-                    <div class="number-stats" id="frontStats"></div>
-                </div>
-                <div>
-                    <h4 style="color: #4a5568; margin-bottom: 10px;">后区号码出现频率</h4>
-                    <div class="number-stats" id="backStats"></div>
-                </div>
-            </div>
+            <div id="statisticsContent" style="display:none;margin-top:20px;"></div>
         </div>
     </div>
 
@@ -645,97 +308,83 @@
         let myNumbers = [[], []];
         let winningNumbers = [[], []];
         let batchResults = [];
-        let numberStats = {
-            front: Array(35).fill(0),
-            back: Array(12).fill(0)
-        };
+        let drawHistory = [];
+        let excludeNumbers = { front: [], back: [] };
+        let numberStats = { front: Array(35).fill(0), back: Array(12).fill(0) };
 
-        function formatNumber(num) {
-            return num.toString().padStart(2, '0');
-        }
-
-        function formatNumbersForDisplay(numbers) {
-            return numbers.map(n => formatNumber(n));
-        }
+        function formatNumber(num) { return num.toString().padStart(2, '0'); }
 
         function generateLotteryNumbers() {
-            const frontPool = Array.from({length: 35}, (_, i) => i + 1);
-            const frontNumbers = shuffleArray(frontPool).slice(0, 5).sort((a, b) => a - b);
-            
-            const backPool = Array.from({length: 12}, (_, i) => i + 1);
-            const backNumbers = shuffleArray(backPool).slice(0, 2).sort((a, b) => a - b);
-            
-            frontNumbers.forEach(num => numberStats.front[num - 1]++);
-            backNumbers.forEach(num => numberStats.back[num - 1]++);
-            
-            return [frontNumbers, backNumbers];
+            let frontPool = Array.from({length: 35}, (_, i) => i + 1);
+            let backPool = Array.from({length: 12}, (_, i) => i + 1);
+
+            if (excludeNumbers.front.length > 0 && excludeNumbers.front.length <= 30) {
+                const filtered = frontPool.filter(n => !excludeNumbers.front.includes(n));
+                if (filtered.length >= 5) frontPool = filtered;
+            }
+            if (excludeNumbers.back.length > 0 && excludeNumbers.back.length <= 10) {
+                const filtered = backPool.filter(n => !excludeNumbers.back.includes(n));
+                if (filtered.length >= 2) backPool = filtered;
+            }
+
+            const frontNums = shuffleArray(frontPool).slice(0, 5).sort((a, b) => a - b);
+            const backNums = shuffleArray(backPool).slice(0, 2).sort((a, b) => a - b);
+
+            frontNums.forEach(num => numberStats.front[num - 1]++);
+            backNums.forEach(num => numberStats.back[num - 1]++);
+
+            return [frontNums, backNums];
         }
 
         function shuffleArray(array) {
-            const newArray = [...array];
-            for (let i = newArray.length - 1; i > 0; i--) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+                [arr[i], arr[j]] = [arr[j], arr[i]];
             }
-            return newArray;
+            return arr;
         }
 
-        function displayNumbers(numbers, frontElementId, backElementId) {
-            const [front, back] = numbers;
-            const frontContainer = document.getElementById(frontElementId);
-            const backContainer = document.getElementById(backElementId);
-            
-            frontContainer.innerHTML = '';
-            backContainer.innerHTML = '';
-            
-            front.forEach(num => {
-                const span = document.createElement('span');
-                span.className = 'number-item rolling-number';
-                span.textContent = formatNumber(num);
-                frontContainer.appendChild(span);
+        function displayNumbers(numbers, frontElId, backElId) {
+            const fc = document.getElementById(frontElId), bc = document.getElementById(backElId);
+            fc.innerHTML = ''; bc.innerHTML = '';
+
+            numbers[0].forEach(num => {
+                const s = document.createElement('span');
+                s.className = 'number-item rolling-number';
+                s.textContent = formatNumber(num);
+                fc.appendChild(s);
             });
-            
-            back.forEach(num => {
-                const span = document.createElement('span');
-                span.className = 'number-item blue rolling-number';
-                span.textContent = formatNumber(num);
-                backContainer.appendChild(span);
+            numbers[1].forEach(num => {
+                const s = document.createElement('span');
+                s.className = 'number-item blue rolling-number';
+                s.textContent = formatNumber(num);
+                bc.appendChild(s);
             });
         }
 
-        function calculateMatches(userNumbers, winningNumbers) {
-            const [userFront, userBack] = userNumbers;
-            const [winFront, winBack] = winningNumbers;
-            
-            const frontMatches = userFront.filter(num => winFront.includes(num)).length;
-            const backMatches = userBack.filter(num => winBack.includes(num)).length;
-            
-            return { frontMatches, backMatches };
+        function calculateMatches(user, win) {
+            const fm = user[0].filter(n => win[0].includes(n)).length;
+            const bm = user[1].filter(n => win[1].includes(n)).length;
+            return { frontMatches: fm, backMatches: bm };
         }
 
-        function determinePrizeLevel(frontMatches, backMatches) {
-            const prizeRules = {
-                '5,2': '一等奖',
-                '5,1': '二等奖',
-                '5,0': '三等奖',
-                '4,2': '四等奖',
-                '4,1': '五等奖',
-                '3,2': '五等奖',
-                '4,0': '六等奖',
-                '3,1': '六等奖',
-                '2,2': '六等奖',
-                '3,0': '七等奖',
-                '2,1': '七等奖',
-                '1,2': '七等奖',
-                '2,0': '八等奖',
-                '1,1': '八等奖',
-                '0,2': '八等奖',
-                '1,0': '九等奖',
-                '0,1': '九等奖'
+        function determinePrizeLevel(fm, bm) {
+            const rules = {
+                '5,2':'一等奖','5,1':'二等奖','5,0':'三等奖',
+                '4,2':'四等奖','4,1':'五等奖','3,2':'五等奖',
+                '4,0':'六等奖','3,1':'六等奖','2,2':'六等奖',
+                '3,0':'七等奖','2,1':'七等奖','1,2':'七等奖',
+                '2,0':'八等奖','1,1':'八等奖','0,2':'八等奖',
+                '1,0':'九等奖','0,1':'九等奖'
             };
-            
-            const key = `${frontMatches},${backMatches}`;
-            return prizeRules[key] || '未中奖';
+            return rules[`${fm},${bm}`] || '未中奖';
+        }
+
+        function hideSections() {
+            ['manualSection','batchSection','filterSection','historySection'].forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
         }
 
         function singleDraw() {
@@ -752,28 +401,15 @@
         }
 
         function simulateWithManualInput() {
-            const frontInput = document.getElementById('frontNumbers').value.trim();
-            const backInput = document.getElementById('backNumbers').value.trim();
-            
-            if (!frontInput || !backInput) {
-                showNotification('请输入完整的号码！', 'error');
-                return;
-            }
-            
-            const frontNumbers = frontInput.split(/\s+/).map(Number);
-            const backNumbers = backInput.split(/\s+/).map(Number);
-            
-            if (frontNumbers.length !== 5 || backNumbers.length !== 2) {
-                showNotification('号码数量不正确！前区应为5个，后区应为2个', 'error');
-                return;
-            }
-            
-            if (!frontNumbers.every(n => n >= 1 && n <= 35) || !backNumbers.every(n => n >= 1 && n <= 12)) {
-                showNotification('号码超出范围！前区应在1-35之间，后区应在1-12之间', 'error');
-                return;
-            }
-            
-            myNumbers = [frontNumbers.sort((a, b) => a - b), backNumbers.sort((a, b) => a - b)];
+            const fi = document.getElementById('frontNumbers').value.trim();
+            const bi = document.getElementById('backNumbers').value.trim();
+            if (!fi || !bi) { showNotification('请输入完整的号码！', 'error'); return; }
+
+            const fn = fi.split(/\s+/).map(Number), bn = bi.split(/\s+/).map(Number);
+            if (fn.length !== 5 || bn.length !== 2) { showNotification('号码数量不正确！前区应为5个，后区应为2个', 'error'); return; }
+            if (!fn.every(n => n >= 1 && n <= 35) || !bn.every(n => n >= 1 && n <= 12)) { showNotification('号码超出范围！', 'error'); return; }
+
+            myNumbers = [fn.sort((a,b)=>a-b), bn.sort((a,b)=>a-b)];
             updateDisplay();
             setTimeout(drawWinningNumbers, 800);
         }
@@ -785,56 +421,49 @@
 
         function performBatchDraw() {
             const count = parseInt(document.getElementById('batchCount').value);
-            
-            if (isNaN(count) || count <= 0 || count > 100) {
-                showNotification('请输入1-100之间的数字', 'error');
-                return;
-            }
-            
+            if (!count || count <= 0 || count > 100) { showNotification('请输入1-100之间的数字', 'error'); return; }
+
             hideSections();
             document.getElementById('matchResult').innerHTML = '<div class="loading">正在批量模拟中</div>';
-            
+
             setTimeout(() => {
                 let wins = 0;
                 batchResults = [];
-                
+
                 for (let i = 0; i < count; i++) {
                     myNumbers = generateLotteryNumbers();
                     winningNumbers = generateLotteryNumbers();
-                    
-                    const matches = calculateMatches(myNumbers, winningNumbers);
-                    const prize = determinePrizeLevel(matches.frontMatches, matches.backMatches);
-                    
-                    if (prize !== '未中奖') {
-                        wins++;
-                    }
-                    
+                    const m = calculateMatches(myNumbers, winningNumbers);
+                    const prize = determinePrizeLevel(m.frontMatches, m.backMatches);
+                    if (prize !== '未中奖') wins++;
+
                     batchResults.push({
                         round: i + 1,
-                        myFront: myNumbers[0].map(n => formatNumber(n)).join(' '),
-                        myBack: myNumbers[1].map(n => formatNumber(n)).join(' '),
-                        winFront: winningNumbers[0].map(n => formatNumber(n)).join(' '),
-                        winBack: winningNumbers[1].map(n => formatNumber(n)).join(' '),
-                        matches: `前区${matches.frontMatches}个, 后区${matches.backMatches}个`,
+                        myFront: myNumbers[0].map(formatNumber).join(' '),
+                        myBack: myNumbers[1].map(formatNumber).join(' '),
+                        winFront: winningNumbers[0].map(formatNumber).join(' '),
+                        winBack: winningNumbers[1].map(formatNumber).join(' '),
+                        matches: `前区${m.frontMatches}个, 后区${m.backMatches}个`,
                         prize: prize
                     });
+                    addToHistory(`批量第${i+1}次`, myNumbers, winningNumbers, prize);
                 }
-                
+
                 updateDisplay();
-                
-                let resultHTML = `<h3>📊 批量模拟结果 (${count}次)</h3>`;
-                resultHTML += `<p>✨ 中奖次数: <strong>${wins}</strong></p>`;
-                resultHTML += `<p>🎯 中奖率: <strong>${(wins/count*100).toFixed(2)}%</strong></p>`;
-                resultHTML += `<div class="batch-copy-buttons" style="margin-top:15px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-                    <button onclick="copyBatchMyNumbers()" class="copy-btn">📋 复制全部选号</button>
-                    <button onclick="copyBatchWinNumbers()" class="copy-btn" style="background:linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);box-shadow:0 4px 15px rgba(79,172,254,0.4);">📋 复制全部开奖号</button>
-                </div>`;
-                resultHTML += '<details open><summary>查看详细结果</summary><div class="batch-results-list">';
-                
+
+                let html = `<h3>📊 批量模拟结果 (${count}次)</h3>`;
+                html += `<p>✨ 中奖次数: <strong>${wins}</strong></p>`;
+                html += `<p>🎯 中奖率: <strong>${(wins/count*100).toFixed(2)}%</strong></p>`;
+                html += `<div style="margin-top:15px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">`;
+                html += `<button onclick="copyBatchMyNumbers()" class="copy-btn">📋 复制全部选号</button>`;
+                html += `<button onclick="copyBatchWinNumbers()" class="copy-btn" style="background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%)">📋 复制全部开奖号</button>`;
+                html += `</div>`;
+                html += '<details open><summary>查看详细结果</summary><div class="batch-results-list">';
+
                 batchResults.forEach(r => {
-                    const prizeColor = r.prize === '未中奖' ? '#999' : '#38ef7d';
-                    const prizeStyle = r.prize === '未中奖' ? '' : 'font-weight:600;';
-                    resultHTML += `
+                    const pc = r.prize === '未中奖' ? '#999' : '#38ef7d';
+                    const ps = r.prize === '未中奖' ? '' : 'font-weight:600;';
+                    html += `
                         <div class="batch-result-item">
                             <span class="batch-round">第${r.round}次</span>
                             <span class="batch-numbers">
@@ -844,24 +473,19 @@
                                 </div>
                             </span>
                             <span class="batch-matches">${r.matches}</span>
-                            <span class="batch-prize" style="color:${prizeColor};${prizeStyle}">${r.prize}</span>
-                        </div>
-                    `;
+                            <span class="batch-prize" style="color:${pc};${ps}">${r.prize}</span>
+                        </div>`;
                 });
-                
-                resultHTML += '</div></details>';
-                
-                document.getElementById('matchResult').innerHTML = resultHTML;
+
+                html += '</div></details>';
+                document.getElementById('matchResult').innerHTML = html;
             }, 800);
         }
 
         function drawWinningNumbers() {
-            const frontContainer = document.getElementById('winFrontNumbers');
-            const backContainer = document.getElementById('winBackNumbers');
-            
-            frontContainer.innerHTML = '<div class="loading">开奖中</div>';
-            backContainer.innerHTML = '<div class="loading">开奖中</div>';
-            
+            document.getElementById('winFrontNumbers').innerHTML = '<div class="loading">开奖中</div>';
+            document.getElementById('winBackNumbers').innerHTML = '<div class="loading">开奖中</div>';
+
             setTimeout(() => {
                 winningNumbers = generateLotteryNumbers();
                 animateLotteryDraw(winningNumbers);
@@ -869,36 +493,30 @@
         }
 
         function animateLotteryDraw(numbers) {
-            const [front, back] = numbers;
-            const frontContainer = document.getElementById('winFrontNumbers');
-            const backContainer = document.getElementById('winBackNumbers');
-            
-            frontContainer.innerHTML = '';
-            backContainer.innerHTML = '';
-            
-            let frontIndex = 0;
-            const frontInterval = setInterval(() => {
-                if (frontIndex < front.length) {
-                    const span = document.createElement('span');
-                    span.className = 'number-item rolling-number';
-                    span.textContent = formatNumber(front[frontIndex]);
-                    frontContainer.appendChild(span);
-                    frontIndex++;
-                } else {
-                    clearInterval(frontInterval);
-                }
+            const fc = document.getElementById('winFrontNumbers'), bc = document.getElementById('winBackNumbers');
+            fc.innerHTML = ''; bc.innerHTML = '';
+
+            let fi = 0;
+            const fiInt = setInterval(() => {
+                if (fi < numbers[0].length) {
+                    const s = document.createElement('span');
+                    s.className = 'number-item rolling-number';
+                    s.textContent = formatNumber(numbers[0][fi]);
+                    fc.appendChild(s);
+                    fi++;
+                } else clearInterval(fiInt);
             }, 350);
-            
-            let backIndex = 0;
-            const backInterval = setInterval(() => {
-                if (backIndex < back.length) {
-                    const span = document.createElement('span');
-                    span.className = 'number-item blue rolling-number';
-                    span.textContent = formatNumber(back[backIndex]);
-                    backContainer.appendChild(span);
-                    backIndex++;
+
+            let bi = 0;
+            const biInt = setInterval(() => {
+                if (bi < numbers[1].length) {
+                    const s = document.createElement('span');
+                    s.className = 'number-item blue rolling-number';
+                    s.textContent = formatNumber(numbers[1][bi]);
+                    bc.appendChild(s);
+                    bi++;
                 } else {
-                    clearInterval(backInterval);
+                    clearInterval(biInt);
                     setTimeout(showResults, 400);
                 }
             }, 350);
@@ -912,221 +530,252 @@
         }
 
         function showResults() {
-            const matches = calculateMatches(myNumbers, winningNumbers);
-            const prize = determinePrizeLevel(matches.frontMatches, matches.backMatches);
-            
-            document.getElementById('matchResult').innerHTML = `
-                <p>🔴 前区匹配: <strong>${matches.frontMatches}</strong> 个</p>
-                <p>🔵 后区匹配: <strong>${matches.backMatches}</strong> 个</p>
-            `;
-            
-            const resultSection = document.getElementById('resultSection');
-            resultSection.style.display = 'block';
-            
-            if (prize !== '未中奖') {
-                resultSection.className = 'result-section winning pulse-animation';
-                document.getElementById('resultText').innerHTML = `<h3>🎉 恭喜您获得: ${prize} 🎉</h3>`;
-            } else {
-                resultSection.className = 'result-section not-winning';
-                document.getElementById('resultText').innerHTML = '<h3>💫 很遗憾，未中奖，请再接再厉！</h3>';
-            }
-        }
+            const m = calculateMatches(myNumbers, winningNumbers);
+            const prize = determinePrizeLevel(m.frontMatches, m.backMatches);
 
-        function hideSections() {
-            document.getElementById('manualSection').style.display = 'none';
-            document.getElementById('batchSection').style.display = 'none';
-            document.getElementById('statisticsContent').style.display = 'none';
+            document.getElementById('matchResult').innerHTML =
+                `<p>🔴 前区匹配: <strong>${m.frontMatches}</strong> 个</p>` +
+                `<p>🔵 后区匹配: <strong>${m.backMatches}</strong> 个</p>`;
+
+            const rs = document.getElementById('resultSection');
+            rs.style.display = 'block';
+
+            if (prize !== '未中奖') {
+                rs.className = 'result-section winning pulse-animation';
+                rs.querySelector('#resultText').innerHTML = `<h3>🎉 恭喜您获得: ${prize} 🎉</h3>`;
+            } else {
+                rs.className = 'result-section not-winning';
+                rs.querySelector('#resultText').innerHTML = '<h3>💫 很遗憾，未中奖，请再接再厉！</h3>';
+            }
+
+            addToHistory('单次摇号', myNumbers, winningNumbers, prize);
         }
 
         function copyMyNumbers() {
-            const frontNumbers = myNumbers[0].map(n => formatNumber(n)).join(' ');
-            const backNumbers = myNumbers[1].map(n => formatNumber(n)).join(' ');
-            const textToCopy = `${frontNumbers} + ${backNumbers}`;
-            
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                showNotification('我的号码已复制到剪贴板！', 'success');
-            }).catch(err => {
-                console.error('复制失败:', err);
-                showNotification('复制失败，请手动复制', 'error');
-            });
+            navigator.clipboard.writeText(`${myNumbers[0].map(formatNumber).join(' ')} + ${myNumbers[1].map(formatNumber).join(' ')}`)
+                .then(() => showNotification('我的号码已复制到剪贴板！', 'success'))
+                .catch(() => showNotification('复制失败', 'error'));
         }
 
         function copyWinningNumbers() {
-            if (winningNumbers[0].length === 0 || winningNumbers[1].length === 0) {
-                showNotification('还没有开奖号码！', 'warning');
-                return;
-            }
-            const frontNumbers = winningNumbers[0].map(n => formatNumber(n)).join(' ');
-            const backNumbers = winningNumbers[1].map(n => formatNumber(n)).join(' ');
-            const textToCopy = `${frontNumbers} + ${backNumbers}`;
-            
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                showNotification('开奖号码已复制到剪贴板！', 'success');
-            }).catch(err => {
-                console.error('复制失败:', err);
-                showNotification('复制失败，请手动复制', 'error');
-            });
-        }
-
-        function copyAllBatchResults() {
-            if (batchResults.length === 0) {
-                showNotification('没有批量结果可复制！', 'warning');
-                return;
-            }
-            
-            let text = `大乐透批量模拟结果 (共${batchResults.length}次)\n`;
-            text += `${'='.repeat(50)}\n\n`;
-            
-            batchResults.forEach(r => {
-                text += `【第${r.round}次】\n`;
-                text += `选号: ${r.myFront} + ${r.myBack}\n`;
-                text += `开奖: ${r.winFront} + ${r.winBack}\n`;
-                text += `${r.matches} → ${r.prize}\n`;
-                text += '-'.repeat(40) + '\n';
-            });
-            
-            const wins = batchResults.filter(r => r.prize !== '未中奖').length;
-            text += `\n📊 统计: 中奖${wins}次, 中奖率${(wins/batchResults.length*100).toFixed(2)}%`;
-            
-            navigator.clipboard.writeText(text).then(() => {
-                showNotification(`已复制全部${batchResults.length}条结果！`, 'success');
-            }).catch(err => {
-                console.error('复制失败:', err);
-                showNotification('复制失败，请手动复制', 'error');
-            });
+            if (winningNumbers[0].length === 0) { showNotification('还没有开奖号码！', 'warning'); return; }
+            navigator.clipboard.writeText(`${winningNumbers[0].map(formatNumber).join(' ')} + ${winningNumbers[1].map(formatNumber).join(' ')}`)
+                .then(() => showNotification('开奖号码已复制到剪贴板！', 'success'))
+                .catch(() => showNotification('复制失败', 'error'));
         }
 
         function copyBatchMyNumbers() {
-            if (batchResults.length === 0) {
-                showNotification('没有选号数据可复制！', 'warning');
-                return;
-            }
-            const lines = batchResults.map(r => `${r.myFront} + ${r.myBack}`);
-            const textToCopy = lines.join('\n');
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                showNotification(`已复制${batchResults.length}组选号号码！`, 'success');
-            }).catch(err => {
-                showNotification('复制失败，请手动复制', 'error');
-            });
+            if (!batchResults.length) { showNotification('没有选号数据！', 'warning'); return; }
+            navigator.clipboard.writeText(batchResults.map(r => `${r.myFront} + ${r.myBack}`).join('\n'))
+                .then(() => showNotification(`已复制${batchResults.length}组选号号码！`, 'success'))
+                .catch(() => showNotification('复制失败', 'error'));
         }
 
         function copyBatchWinNumbers() {
-            if (batchResults.length === 0) {
-                showNotification('没有开奖数据可复制！', 'warning');
+            if (!batchResults.length) { showNotification('没有开奖数据！', 'warning'); return; }
+            navigator.clipboard.writeText(batchResults.map(r => `${r.winFront} + ${r.winBack}`).join('\n'))
+                .then(() => showNotification(`已复制${batchResults.length}组开奖号码！`, 'success'))
+                .catch(() => showNotification('复制失败', 'error'));
+        }
+
+        // ---- 筛选功能 ----
+        function toggleFilterSection() {
+            const el = document.getElementById('filterSection');
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function applyFilter() {
+            const fi = document.getElementById('excludeFront').value.trim();
+            const bi = document.getElementById('excludeBack').value.trim();
+            excludeNumbers.front = fi ? fi.split(/\s+/).map(Number).filter(n => n >= 1 && n <= 35) : [];
+            excludeNumbers.back = bi ? bi.split(/\s+/).map(Number).filter(n => n >= 1 && n <= 12) : [];
+            if (excludeNumbers.front.length > 0 || excludeNumbers.back.length > 0) {
+                showNotification(`已排除前区${excludeNumbers.front.length}个、后区${excludeNumbers.back.length}个号码`, 'success');
+            }
+            document.getElementById('filterSection').style.display = 'none';
+        }
+
+        function clearFilter() {
+            excludeNumbers = { front: [], back: [] };
+            document.getElementById('excludeFront').value = '';
+            document.getElementById('excludeBack').value = '';
+            showNotification('已清除所有筛选条件', 'success');
+        }
+
+        // ---- 历史记录功能 ----
+        function addToHistory(type, myNum, winNum, prize) {
+            drawHistory.unshift({
+                time: new Date().toLocaleString(),
+                type: type,
+                myFront: myNum[0].map(formatNumber).join(' '),
+                myBack: myNum[1].map(formatNumber).join(' '),
+                winFront: winNum[0].map(formatNumber).join(' '),
+                winBack: winNum[1].map(formatNumber).join(' '),
+                prize: prize
+            });
+            if (drawHistory.length > 100) drawHistory.pop();
+        }
+
+        function showHistoryPanel() {
+            const el = document.getElementById('historySection');
+            if (el.style.display === 'none' || !el.style.display) {
+                el.style.display = 'block';
+                renderHistoryTable();
+            } else {
+                el.style.display = 'none';
+            }
+        }
+
+        function renderHistoryTable() {
+            const container = document.getElementById('historyContent');
+            if (!drawHistory.length) {
+                container.innerHTML = '<p style="text-align:center;color:#999;">暂无历史记录</p>';
                 return;
             }
-            const lines = batchResults.map(r => `${r.winFront} + ${r.winBack}`);
-            const textToCopy = lines.join('\n');
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                showNotification(`已复制${batchResults.length}组开奖号码！`, 'success');
-            }).catch(err => {
-                showNotification('复制失败，请手动复制', 'error');
+
+            let html = '<table><tr><th>时间</th><th>类型</th><th>选号</th><th>开奖</th><th>结果</th></tr>';
+            drawHistory.forEach(h => {
+                const pc = h.prize === '未中奖' ? '#999' : '#38ef7d';
+                html += `<tr>
+                    <td>${h.time.split(' ')[1]||h.time}</td>
+                    <td>${h.type}</td>
+                    <td style="color:#ee5a52;">${h.myFront} + ${h.myBack}</td>
+                    <td style="color:#4facfe;">${h.winFront} + ${h.winBack}</td>
+                    <td style="color:${pc};font-weight:600;">${h.prize}</td>
+                </tr>`;
             });
+            html += '</table>';
+            container.innerHTML = html;
         }
 
+        function clearHistory() {
+            if (!drawHistory.length) { showNotification('历史记录已是空的', 'warning'); return; }
+            drawHistory = [];
+            document.getElementById('historyContent').innerHTML = '<p style="text-align:center;color:#999;">暂无历史记录</p>';
+            showNotification('已清空历史记录', 'success');
+        }
+
+        function exportHistory() {
+            if (!drawHistory.length) { showNotification('没有历史记录可导出', 'warning'); return; }
+            let txt = '大乐透摇号历史记录\n====================\n\n';
+            drawHistory.forEach(h => {
+                txt += `【${h.type}】${h.time}\n`;
+                txt += `选号: ${h.myFront} + ${h.myBack}\n`;
+                txt += `开奖: ${h.winFront} + ${h.winBack}\n`;
+                txt += `结果: ${h.prize}\n${'-'.repeat(30)}\n\n`;
+            });
+            const blob = new Blob([txt], {type:'text/plain;charset=utf-8'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `大乐透历史记录_${new Date().toISOString().slice(0,10)}.txt`;
+            a.click(); URL.revokeObjectURL(a.href);
+            showNotification('历史记录已导出为TXT文件', 'success');
+        }
+
+        // ---- 统计功能 ----
         function showStatistics() {
-            const statsContent = document.getElementById('statisticsContent');
-            if (statsContent.style.display === 'none') {
-                statsContent.style.display = 'block';
-                displayStatistics();
+            const el = document.getElementById('statisticsContent');
+            if (el.style.display === 'none') {
+                el.style.display = 'block';
+                renderStatistics();
             } else {
-                statsContent.style.display = 'none';
+                el.style.display = 'none';
             }
         }
 
-        function displayStatistics() {
-            const frontStats = document.getElementById('frontStats');
-            const backStats = document.getElementById('backStats');
-            
-            frontStats.innerHTML = '';
-            backStats.innerHTML = '';
-            
-            const maxFrontCount = Math.max(...numberStats.front);
-            const maxBackCount = Math.max(...numberStats.back);
-            
+        function renderStatistics() {
+            const maxF = Math.max(...numberStats.front), maxB = Math.max(...numberStats.back);
+            const fStats = document.getElementById('frontStats') || createStatContainer('frontStats');
+            const bStats = document.getElementById('backStats') || createStatContainer('backStats');
+
+            let fHtml = '', bHtml = '';
             for (let i = 0; i < 35; i++) {
-                const num = i + 1;
-                const count = numberStats.front[i];
-                const statItem = document.createElement('span');
-                statItem.className = 'stat-item' + (count === maxFrontCount && count > 0 ? ' high' : '');
-                statItem.textContent = `${formatNumber(num)}: ${count}`;
-                frontStats.appendChild(statItem);
+                const c = numberStats.front[i];
+                fHtml += `<span class="stat-item${c===maxF&&c>0?' high':''}">${formatNumber(i+1)}: ${c}</span>`;
             }
-            
             for (let i = 0; i < 12; i++) {
-                const num = i + 1;
-                const count = numberStats.back[i];
-                const statItem = document.createElement('span');
-                statItem.className = 'stat-item' + (count === maxBackCount && count > 0 ? ' high' : '');
-                statItem.textContent = `${formatNumber(num)}: ${count}`;
-                backStats.appendChild(statItem);
+                const c = numberStats.back[i];
+                bHtml += `<span class="stat-item${c===maxB&&c>0?' high':''}">${formatNumber(i+1)}: ${c}</span>`;
             }
+
+            document.getElementById('statisticsContent').innerHTML = `
+                <div style="margin-bottom:20px;"><h4 style="color:#4a5568;margin-bottom:10px;">前区号码出现频率</h4><div class="number-stats">${fHtml}</div></div>
+                <div><h4 style="color:#4a5568;margin-bottom:10px;">后区号码出现频率</h4><div class="number-stats">${bHtml}</div></div>`;
         }
 
-        function showNotification(message, type) {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 15px 25px;
-                border-radius: 10px;
-                color: white;
-                font-weight: 500;
-                z-index: 1000;
-                animation: slideIn 0.3s ease;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            `;
-            
-            switch(type) {
-                case 'success':
-                    notification.style.background = 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)';
-                    break;
-                case 'error':
-                    notification.style.background = 'linear-gradient(135deg, #eb3349 0%, #f45c43 100%)';
-                    break;
-                case 'warning':
-                    notification.style.background = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
-                    break;
-                default:
-                    notification.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-            }
-            
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => notification.remove(), 300);
-            }, 2500);
+        function createStatContainer(id) {
+            const d = document.createElement('div');
+            d.id = id;
+            d.className = 'number-stats';
+            return d;
         }
 
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-            }
-            @keyframes slideOut {
-                from {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-                to {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
+        // ---- 冷热分析功能 ----
+        function showHotColdAnalysis() {
+            const el = document.getElementById('statisticsContent');
+            el.style.display = 'block';
+            renderHotCold();
+        }
 
-        window.onload = function() {
+        function getHotColdData() {
+            const fCounts = numberStats.front.map((c,i)=>({num:i+1,count:c})).sort((a,b)=>b.count-a.count);
+            const bCounts = numberStats.back.map((c,i)=>({num:i+1,count:c})).sort((a,b)=>b.count-a.count);
+            return {
+                frontHot: fCounts.slice(0,10).map(x=>x.num),
+                frontCold: fCounts.slice(-10).reverse().map(x=>x.num),
+                backHot: bCounts.slice(0,5).map(x=>x.num),
+                backCold: bCounts.slice(-5).reverse().map(x=>x.num)
+            };
+        }
+
+        function renderHotCold() {
+            const data = getHotColdData();
+            const total = Math.max(...numberStats.front, ...numberStats.back) || 1;
+
+            const numTag = (num, count) =>
+                `<span class="hot-cold-num" style="opacity:${0.4 + (count/total)*0.6}">${formatNumber(num)}</span>`;
+
+            const makeCard = (title, nums, cls) => `
+                <div class="hot-cold-card ${cls}">
+                    <h5>${title}</h5>
+                    <div class="hot-cold-numbers">${nums.map(n => numTag(n, numberStats[n<=35?'front':'back'][n-1])).join('')}</div>
+                </div>`;
+
+            document.getElementById('statisticsContent').innerHTML = `
+                <h4 style="color:#2d3748;margin-bottom:15px;">🔥 冷热号码分析（基于当前会话统计数据）</h4>
+                <div class="hot-cold-grid">
+                    ${makeCard('🔴 前区热门 TOP10', data.frontHot, 'hot-card-front')}
+                    ${makeCard('🔵 前区冷门 TOP10', data.frontCold, 'cold-card-front')}
+                    ${makeCard('🟣 后区热门 TOP5', data.backHot, 'hot-card-back')}
+                    ${makeCard('🟢 后区冷门 TOP5', data.backCold, 'cold-card-back')}
+                </div>
+                <div style="margin-top:15px;text-align:center;color:#888;font-size:13px;">
+                    透明度越低 = 出现次数越少 | 透明度越高 = 出现次数越多
+                </div>`;
+        }
+
+        // ---- 通知系统 ----
+        function showNotification(msg, type) {
+            const colors = { success:'linear-gradient(135deg,#11998e,#38ef7d)', error:'linear-gradient(135deg,#eb3349,#f45c43)', warning:'linear-gradient(135deg,#f093fb,#f5576c)' };
+            const n = document.createElement('div');
+            Object.assign(n.style, {
+                position:'fixed',top:'20px',right:'20px',padding:'15px 25px',borderRadius:'10px',
+                color:'#fff',fontWeight:'500',zIndex:'1000',animation:'slideIn .3s ease',boxShadow:'0 4px 15px rgba(0,0,0,.2)',
+                background: colors[type] || colors.success
+            });
+            n.textContent = msg;
+            document.body.appendChild(n);
+            setTimeout(()=>{ n.style.animation='slideOut .3s ease'; setTimeout(()=>n.remove(),300); }, 2500);
+        }
+
+        // 注入动画样式
+        const animStyle = document.createElement('style');
+        animStyle.textContent = `
+            @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+            @keyframes slideOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:0}}`;
+        document.head.appendChild(animStyle);
+
+        window.onload = () => {
             myNumbers = generateLotteryNumbers();
             updateDisplay();
         };

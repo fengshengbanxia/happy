@@ -1,0 +1,17 @@
+{
+  "name": "happy",
+  "version": "1.0.0",
+  "description": "这是一个功能完整的大乐透摇号模拟器网页应用，支持单次摇号、批量摇号、手动输入号码、复制号码、统计号码出现次数、历史记录、号码筛选和冷热分析等功能。",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1"
+  }
+}
