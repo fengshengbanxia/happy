@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>大乐透摇号模拟器</title>
+    <title>彩票摇号模拟器</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -34,37 +34,47 @@
             letter-spacing: 1px;
         }
         .subtitle { text-align: center; color: #666; margin-bottom: 35px; font-size: 14px; }
-        
+
+        /* 类型切换 */
+        .type-switch {
+            display: flex; justify-content: center; gap: 0; margin-bottom: 30px;
+            background: #f0f0f0; border-radius: 30px; padding: 4px; max-width: 400px; margin-left: auto; margin-right: auto;
+        }
+        .type-btn {
+            flex: 1; padding: 12px 24px; border: none; border-radius: 26px;
+            font-size: 16px; font-weight: 600; cursor: pointer;
+            transition: all 0.3s ease; background: transparent; color: #666;
+            box-shadow: none;
+        }
+        .type-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        .type-btn:hover:not(.active) { color: #333; background: #e0e0e0; }
+        .type-btn::before { display: none; }
+
         .section {
-            margin-bottom: 25px;
-            padding: 25px;
+            margin-bottom: 25px; padding: 25px;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             border-radius: 15px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .section:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); }
         .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #2d3748;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-size: 18px; font-weight: 600; margin-bottom: 20px; color: #2d3748;
+            display: flex; align-items: center; gap: 10px;
         }
         .section-title::before {
-            content: '';
-            width: 4px;
-            height: 18px;
+            content: ''; width: 4px; height: 18px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 2px;
         }
 
         .numbers-display { display: flex; justify-content: space-around; margin: 20px 0; flex-wrap: wrap; gap: 30px; }
         .number-group { text-align: center; flex: 1; min-width: 200px; }
-        .number-group-label { font-size: 16px; font-weight: 600; color: #4a5568; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .number-group-label { font-size: 16px; font-weight: 600; color: #4a5568; margin-bottom: 12px; letter-spacing: 1px; }
         .number-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 15px; }
-        
+
         .number-item {
             width: 52px; height: 52px; line-height: 52px; border-radius: 50%;
             background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
@@ -95,6 +105,7 @@
         button:hover::before { left: 100%; }
         button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6); }
         button:active { transform: translateY(0); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
         button.secondary { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4); }
         button.secondary:hover { box-shadow: 0 6px 20px rgba(17, 153, 142, 0.6); }
         button.copy-btn {
@@ -192,18 +203,25 @@
             input[type="number"] { width: 100%; }
             .hot-cold-grid { grid-template-columns: 1fr; }
             .batch-result-item { grid-template-columns: 1fr; gap: 5px; }
+            .type-switch { max-width: 100%; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎰 大乐透摇号模拟器</h1>
+        <h1 id="mainTitle">🎰 大乐透摇号模拟器</h1>
         <p class="subtitle">体验真实的摇号乐趣 · 感受幸运的魅力</p>
+
+        <!-- 类型切换 -->
+        <div class="type-switch">
+            <button class="type-btn active" id="btnDLT" onclick="switchType('DLT')">🎯 大乐透</button>
+            <button class="type-btn" id="btnSSQ" onclick="switchType('SSQ')">🔴 双色球</button>
+        </div>
 
         <div class="section">
             <div class="section-title">功能选择</div>
             <div class="button-group">
-                <button onclick="singleDraw()">🎲 单次随机摇号</button>
+                <button id="btnSingle" onclick="singleDraw()">🎲 单次随机摇号</button>
                 <button class="secondary" onclick="manualInput()">✏️ 手动输入号码</button>
                 <button onclick="batchDraw()">📊 批量模拟</button>
             </div>
@@ -217,11 +235,11 @@
         <div class="section" id="filterSection" style="display:none;">
             <div class="section-title">🔍 号码筛选（可选）</div>
             <div class="input-group">
-                <label>排除前区号码（用空格分隔，最多30个）</label>
+                <label id="labelExcludeFront">排除前区号码（用空格分隔，最多30个）</label>
                 <input type="text" id="excludeFront" placeholder="例: 1 5 10 15 20">
             </div>
             <div class="input-group">
-                <label>排除后区号码（用空格分隔，最多10个）</label>
+                <label id="labelExcludeBack">排除后区号码（用空格分隔，最多10个）</label>
                 <input type="text" id="excludeBack" placeholder="例: 2 6">
             </div>
             <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
@@ -242,11 +260,11 @@
         <div class="section" id="manualSection" style="display:none;">
             <div class="section-title">手动输入号码</div>
             <div class="input-group">
-                <label>前区号码 (5个，1-35，用空格分隔)</label>
+                <label id="labelManualFront">前区号码 (5个，1-35，用空格分隔)</label>
                 <input type="text" id="frontNumbers" placeholder="例: 1 5 8 9 20">
             </div>
             <div class="input-group">
-                <label>后区号码 (2个，1-12，用空格分隔)</label>
+                <label id="labelManualBack">后区号码 (2个，1-12，用空格分隔)</label>
                 <input type="text" id="backNumbers" placeholder="例: 3 12">
             </div>
             <div style="text-align:center;"><button onclick="simulateWithManualInput()">开始模拟</button></div>
@@ -265,11 +283,11 @@
             <div class="section-title">我的号码</div>
             <div class="numbers-display">
                 <div class="number-group">
-                    <div class="number-group-label">前区号码</div>
+                    <div class="number-group-label" id="labelMyFront">前区号码</div>
                     <div class="number-list" id="myFrontNumbers"></div>
                 </div>
                 <div class="number-group">
-                    <div class="number-group-label">后区号码</div>
+                    <div class="number-group-label" id="labelMyBack">后区号码</div>
                     <div class="number-list" id="myBackNumbers"></div>
                 </div>
             </div>
@@ -280,18 +298,18 @@
             <div class="section-title">开奖号码</div>
             <div class="numbers-display">
                 <div class="number-group">
-                    <div class="number-group-label">前区号码</div>
+                    <div class="number-group-label" id="labelWinFront">前区号码</div>
                     <div class="number-list" id="winFrontNumbers"></div>
                 </div>
                 <div class="number-group">
-                    <div class="number-group-label">后区号码</div>
+                    <div class="number-group-label" id="labelWinBack">后区号码</div>
                     <div class="number-list" id="winBackNumbers"></div>
                 </div>
             </div>
             <div class="copy-button-container"><button onclick="copyWinningNumbers()" class="copy-btn">📋 复制开奖号码</button></div>
         </div>
 
-        <div class="section match-info"><div id="matchResult"></div></div>
+        <div class="section match-info"><div id="matchResult">点击上方按钮开始摇号</div></div>
         <div class="result-section" id="resultSection" style="display:none;"><div id="resultText"></div></div>
 
         <div class="section" id="statisticsSection">
@@ -305,30 +323,115 @@
     </div>
 
     <script>
+        // ========== 彩票类型配置 ==========
+        const LOTTERY_CONFIG = {
+            DLT: {
+                name: '大乐透',
+                frontName: '前区号码', backName: '后区号码',
+                frontRange: 35, backRange: 12,
+                frontPick: 5, backPick: 2,
+                maxExcludeFront: 30, maxExcludeBack: 10,
+                prizeRules: {
+                    '5,2':'一等奖','5,1':'二等奖','5,0':'三等奖',
+                    '4,2':'四等奖','4,1':'五等奖','3,2':'五等奖',
+                    '4,0':'六等奖','3,1':'六等奖','2,2':'六等奖',
+                    '3,0':'七等奖','2,1':'七等奖','1,2':'七等奖',
+                    '2,0':'八等奖','1,1':'八等奖','0,2':'八等奖',
+                    '1,0':'九等奖','0,1':'九等奖'
+                }
+            },
+            SSQ: {
+                name: '双色球',
+                frontName: '红球号码', backName: '蓝球号码',
+                frontRange: 33, backRange: 16,
+                frontPick: 6, backPick: 1,
+                maxExcludeFront: 27, maxExcludeBack: 15,
+                prizeRules: {
+                    '6,1':'一等奖','6,0':'二等奖',
+                    '5,1':'三等奖','5,0':'四等奖',
+                    '4,1':'四等奖','4,0':'五等奖',
+                    '3,1':'五等奖','2,1':'六等奖',
+                    '1,1':'六等奖','0,1':'六等奖'
+                }
+            }
+        };
+
+        // ========== 状态变量 ==========
+        let currentType = 'DLT';
+        let config = LOTTERY_CONFIG.DLT;
         let myNumbers = [[], []];
         let winningNumbers = [[], []];
         let batchResults = [];
         let drawHistory = [];
         let excludeNumbers = { front: [], back: [] };
-        let numberStats = { front: Array(35).fill(0), back: Array(12).fill(0) };
+        let numberStats = { front: [], back: [] };
+        let isAnimating = false;
+
+        // ========== 初始化 ==========
+        function initStats() {
+            numberStats = { front: Array(config.frontRange).fill(0), back: Array(config.backRange).fill(0) };
+        }
+        initStats();
 
         function formatNumber(num) { return num.toString().padStart(2, '0'); }
 
+        // ========== 类型切换 ==========
+        function switchType(type) {
+            if (isAnimating) return;
+            currentType = type;
+            config = LOTTERY_CONFIG[type];
+
+            // 更新标题
+            document.getElementById('mainTitle').textContent = type === 'DLT' ? '🎰 大乐透摇号模拟器' : '🔴 双色球摇号模拟器';
+
+            // 更新切换按钮
+            document.getElementById('btnDLT').className = 'type-btn' + (type === 'DLT' ? ' active' : '');
+            document.getElementById('btnSSQ').className = 'type-btn' + (type === 'SSQ' ? ' active' : '');
+
+            // 更新标签
+            document.getElementById('labelMyFront').textContent = config.frontName;
+            document.getElementById('labelMyBack').textContent = config.backName;
+            document.getElementById('labelWinFront').textContent = config.frontName;
+            document.getElementById('labelWinBack').textContent = config.backName;
+            document.getElementById('labelManualFront').textContent = `${config.frontName} (${config.frontPick}个，1-${config.frontRange}，用空格分隔)`;
+            document.getElementById('labelManualBack').textContent = `${config.backName} (${config.backPick}个，1-${config.backRange}，用空格分隔)`;
+            document.getElementById('labelExcludeFront').textContent = `排除${config.frontName}（用空格分隔，最多${config.maxExcludeFront}个）`;
+            document.getElementById('labelExcludeBack').textContent = `排除${config.backName}（用空格分隔，最多${config.maxExcludeBack}个）`;
+            document.getElementById('frontNumbers').placeholder = `例: ${Array.from({length:config.frontPick},(_,i)=>i+1).join(' ')}`;
+            document.getElementById('backNumbers').placeholder = `例: ${Array.from({length:config.backPick},(_,i)=>i+1).join(' ')}`;
+
+            // 重置状态
+            initStats();
+            myNumbers = [[], []];
+            winningNumbers = [[], []];
+            batchResults = [];
+            excludeNumbers = { front: [], back: [] };
+            hideSections();
+            document.getElementById('resultSection').style.display = 'none';
+            document.getElementById('statisticsContent').style.display = 'none';
+            document.getElementById('matchResult').innerHTML = '点击上方按钮开始摇号';
+
+            // 生成初始号码
+            myNumbers = generateLotteryNumbers();
+            updateDisplay();
+        }
+
+        // ========== 核心逻辑 ==========
         function generateLotteryNumbers() {
-            let frontPool = Array.from({length: 35}, (_, i) => i + 1);
-            let backPool = Array.from({length: 12}, (_, i) => i + 1);
+            let frontPool = Array.from({length: config.frontRange}, (_, i) => i + 1);
+            let backPool = Array.from({length: config.backRange}, (_, i) => i + 1);
 
-            if (excludeNumbers.front.length > 0 && excludeNumbers.front.length <= 30) {
+            if (excludeNumbers.front.length > 0 && excludeNumbers.front.length <= config.maxExcludeFront) {
                 const filtered = frontPool.filter(n => !excludeNumbers.front.includes(n));
-                if (filtered.length >= 5) frontPool = filtered;
+                if (filtered.length >= config.frontPick) frontPool = filtered;
             }
-            if (excludeNumbers.back.length > 0 && excludeNumbers.back.length <= 10) {
+            if (excludeNumbers.back.length > 0 && excludeNumbers.back.length <= config.maxExcludeBack) {
                 const filtered = backPool.filter(n => !excludeNumbers.back.includes(n));
-                if (filtered.length >= 2) backPool = filtered;
+                if (filtered.length >= config.backPick) backPool = filtered;
             }
 
-            const frontNums = shuffleArray(frontPool).slice(0, 5).sort((a, b) => a - b);
-            const backNums = shuffleArray(backPool).slice(0, 2).sort((a, b) => a - b);
+            const frontNums = shuffleArray(frontPool).slice(0, config.frontPick).sort((a, b) => a - b);
+            const backNums = shuffleArray(backPool).slice(0, config.backPick).sort((a, b) => a - b);
 
             frontNums.forEach(num => numberStats.front[num - 1]++);
             backNums.forEach(num => numberStats.back[num - 1]++);
@@ -348,7 +451,6 @@
         function displayNumbers(numbers, frontElId, backElId) {
             const fc = document.getElementById(frontElId), bc = document.getElementById(backElId);
             fc.innerHTML = ''; bc.innerHTML = '';
-
             numbers[0].forEach(num => {
                 const s = document.createElement('span');
                 s.className = 'number-item rolling-number';
@@ -370,15 +472,7 @@
         }
 
         function determinePrizeLevel(fm, bm) {
-            const rules = {
-                '5,2':'一等奖','5,1':'二等奖','5,0':'三等奖',
-                '4,2':'四等奖','4,1':'五等奖','3,2':'五等奖',
-                '4,0':'六等奖','3,1':'六等奖','2,2':'六等奖',
-                '3,0':'七等奖','2,1':'七等奖','1,2':'七等奖',
-                '2,0':'八等奖','1,1':'八等奖','0,2':'八等奖',
-                '1,0':'九等奖','0,1':'九等奖'
-            };
-            return rules[`${fm},${bm}`] || '未中奖';
+            return config.prizeRules[`${fm},${bm}`] || '未中奖';
         }
 
         function hideSections() {
@@ -387,15 +481,25 @@
             });
         }
 
+        function setAnimating(val) {
+            isAnimating = val;
+            document.querySelectorAll('.button-group button').forEach(b => b.disabled = val);
+        }
+
+        // ========== 单次摇号 ==========
         function singleDraw() {
+            if (isAnimating) return;
             hideSections();
             document.getElementById('resultSection').style.display = 'none';
+            setAnimating(true);
             myNumbers = generateLotteryNumbers();
             updateDisplay();
             setTimeout(drawWinningNumbers, 800);
         }
 
+        // ========== 手动输入 ==========
         function manualInput() {
+            if (isAnimating) return;
             hideSections();
             document.getElementById('manualSection').style.display = 'block';
         }
@@ -406,15 +510,32 @@
             if (!fi || !bi) { showNotification('请输入完整的号码！', 'error'); return; }
 
             const fn = fi.split(/\s+/).map(Number), bn = bi.split(/\s+/).map(Number);
-            if (fn.length !== 5 || bn.length !== 2) { showNotification('号码数量不正确！前区应为5个，后区应为2个', 'error'); return; }
-            if (!fn.every(n => n >= 1 && n <= 35) || !bn.every(n => n >= 1 && n <= 12)) { showNotification('号码超出范围！', 'error'); return; }
+            if (fn.length !== config.frontPick || bn.length !== config.backPick) {
+                showNotification(`号码数量不正确！${config.frontName}应为${config.frontPick}个，${config.backName}应为${config.backPick}个`, 'error'); return;
+            }
+            if (!fn.every(n => n >= 1 && n <= config.frontRange)) {
+                showNotification(`${config.frontName}超出范围！(1-${config.frontRange})`, 'error'); return;
+            }
+            if (!bn.every(n => n >= 1 && n <= config.backRange)) {
+                showNotification(`${config.backName}超出范围！(1-${config.backRange})`, 'error'); return;
+            }
+            if (new Set(fn).size !== fn.length) {
+                showNotification(`${config.frontName}不能有重复号码！`, 'error'); return;
+            }
+            if (new Set(bn).size !== bn.length) {
+                showNotification(`${config.backName}不能有重复号码！`, 'error'); return;
+            }
 
             myNumbers = [fn.sort((a,b)=>a-b), bn.sort((a,b)=>a-b)];
+            hideSections();
+            setAnimating(true);
             updateDisplay();
             setTimeout(drawWinningNumbers, 800);
         }
 
+        // ========== 批量模拟 ==========
         function batchDraw() {
+            if (isAnimating) return;
             hideSections();
             document.getElementById('batchSection').style.display = 'block';
         }
@@ -424,6 +545,7 @@
             if (!count || count <= 0 || count > 100) { showNotification('请输入1-100之间的数字', 'error'); return; }
 
             hideSections();
+            setAnimating(true);
             document.getElementById('matchResult').innerHTML = '<div class="loading">正在批量模拟中</div>';
 
             setTimeout(() => {
@@ -443,7 +565,7 @@
                         myBack: myNumbers[1].map(formatNumber).join(' '),
                         winFront: winningNumbers[0].map(formatNumber).join(' '),
                         winBack: winningNumbers[1].map(formatNumber).join(' '),
-                        matches: `前区${m.frontMatches}个, 后区${m.backMatches}个`,
+                        matches: `${config.frontName.match(/前|红/)[0]}区${m.frontMatches}个, ${config.backName.match(/后|蓝/)[0]}区${m.backMatches}个`,
                         prize: prize
                     });
                     addToHistory(`批量第${i+1}次`, myNumbers, winningNumbers, prize);
@@ -479,9 +601,11 @@
 
                 html += '</div></details>';
                 document.getElementById('matchResult').innerHTML = html;
+                setAnimating(false);
             }, 800);
         }
 
+        // ========== 开奖动画 ==========
         function drawWinningNumbers() {
             document.getElementById('winFrontNumbers').innerHTML = '<div class="loading">开奖中</div>';
             document.getElementById('winBackNumbers').innerHTML = '<div class="loading">开奖中</div>';
@@ -533,9 +657,11 @@
             const m = calculateMatches(myNumbers, winningNumbers);
             const prize = determinePrizeLevel(m.frontMatches, m.backMatches);
 
+            const frontLabel = config.frontName.match(/前|红/)[0];
+            const backLabel = config.backName.match(/后|蓝/)[0];
             document.getElementById('matchResult').innerHTML =
-                `<p>🔴 前区匹配: <strong>${m.frontMatches}</strong> 个</p>` +
-                `<p>🔵 后区匹配: <strong>${m.backMatches}</strong> 个</p>`;
+                `<p>🔴 ${frontLabel}区匹配: <strong>${m.frontMatches}</strong> 个</p>` +
+                `<p>🔵 ${backLabel}区匹配: <strong>${m.backMatches}</strong> 个</p>`;
 
             const rs = document.getElementById('resultSection');
             rs.style.display = 'block';
@@ -549,9 +675,12 @@
             }
 
             addToHistory('单次摇号', myNumbers, winningNumbers, prize);
+            setAnimating(false);
         }
 
+        // ========== 复制功能 ==========
         function copyMyNumbers() {
+            if (myNumbers[0].length === 0) { showNotification('还没有号码！', 'warning'); return; }
             navigator.clipboard.writeText(`${myNumbers[0].map(formatNumber).join(' ')} + ${myNumbers[1].map(formatNumber).join(' ')}`)
                 .then(() => showNotification('我的号码已复制到剪贴板！', 'success'))
                 .catch(() => showNotification('复制失败', 'error'));
@@ -578,7 +707,7 @@
                 .catch(() => showNotification('复制失败', 'error'));
         }
 
-        // ---- 筛选功能 ----
+        // ========== 筛选功能 ==========
         function toggleFilterSection() {
             const el = document.getElementById('filterSection');
             el.style.display = el.style.display === 'none' ? 'block' : 'none';
@@ -587,10 +716,10 @@
         function applyFilter() {
             const fi = document.getElementById('excludeFront').value.trim();
             const bi = document.getElementById('excludeBack').value.trim();
-            excludeNumbers.front = fi ? fi.split(/\s+/).map(Number).filter(n => n >= 1 && n <= 35) : [];
-            excludeNumbers.back = bi ? bi.split(/\s+/).map(Number).filter(n => n >= 1 && n <= 12) : [];
+            excludeNumbers.front = fi ? fi.split(/\s+/).map(Number).filter(n => n >= 1 && n <= config.frontRange) : [];
+            excludeNumbers.back = bi ? bi.split(/\s+/).map(Number).filter(n => n >= 1 && n <= config.backRange) : [];
             if (excludeNumbers.front.length > 0 || excludeNumbers.back.length > 0) {
-                showNotification(`已排除前区${excludeNumbers.front.length}个、后区${excludeNumbers.back.length}个号码`, 'success');
+                showNotification(`已排除${config.frontName}${excludeNumbers.front.length}个、${config.backName}${excludeNumbers.back.length}个号码`, 'success');
             }
             document.getElementById('filterSection').style.display = 'none';
         }
@@ -602,11 +731,12 @@
             showNotification('已清除所有筛选条件', 'success');
         }
 
-        // ---- 历史记录功能 ----
+        // ========== 历史记录 ==========
         function addToHistory(type, myNum, winNum, prize) {
             drawHistory.unshift({
                 time: new Date().toLocaleString(),
                 type: type,
+                lotteryType: currentType,
                 myFront: myNum[0].map(formatNumber).join(' '),
                 myBack: myNum[1].map(formatNumber).join(' '),
                 winFront: winNum[0].map(formatNumber).join(' '),
@@ -633,12 +763,13 @@
                 return;
             }
 
-            let html = '<table><tr><th>时间</th><th>类型</th><th>选号</th><th>开奖</th><th>结果</th></tr>';
+            let html = '<table><tr><th>时间</th><th>类型</th><th>彩种</th><th>选号</th><th>开奖</th><th>结果</th></tr>';
             drawHistory.forEach(h => {
                 const pc = h.prize === '未中奖' ? '#999' : '#38ef7d';
                 html += `<tr>
                     <td>${h.time.split(' ')[1]||h.time}</td>
                     <td>${h.type}</td>
+                    <td>${LOTTERY_CONFIG[h.lotteryType||'DLT'].name}</td>
                     <td style="color:#ee5a52;">${h.myFront} + ${h.myBack}</td>
                     <td style="color:#4facfe;">${h.winFront} + ${h.winBack}</td>
                     <td style="color:${pc};font-weight:600;">${h.prize}</td>
@@ -657,9 +788,9 @@
 
         function exportHistory() {
             if (!drawHistory.length) { showNotification('没有历史记录可导出', 'warning'); return; }
-            let txt = '大乐透摇号历史记录\n====================\n\n';
+            let txt = '彩票摇号历史记录\n====================\n\n';
             drawHistory.forEach(h => {
-                txt += `【${h.type}】${h.time}\n`;
+                txt += `【${h.type}】${LOTTERY_CONFIG[h.lotteryType||'DLT'].name} ${h.time}\n`;
                 txt += `选号: ${h.myFront} + ${h.myBack}\n`;
                 txt += `开奖: ${h.winFront} + ${h.winBack}\n`;
                 txt += `结果: ${h.prize}\n${'-'.repeat(30)}\n\n`;
@@ -667,12 +798,12 @@
             const blob = new Blob([txt], {type:'text/plain;charset=utf-8'});
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = `大乐透历史记录_${new Date().toISOString().slice(0,10)}.txt`;
+            a.download = `彩票摇号历史记录_${new Date().toISOString().slice(0,10)}.txt`;
             a.click(); URL.revokeObjectURL(a.href);
             showNotification('历史记录已导出为TXT文件', 'success');
         }
 
-        // ---- 统计功能 ----
+        // ========== 统计功能 ==========
         function showStatistics() {
             const el = document.getElementById('statisticsContent');
             if (el.style.display === 'none') {
@@ -685,32 +816,23 @@
 
         function renderStatistics() {
             const maxF = Math.max(...numberStats.front), maxB = Math.max(...numberStats.back);
-            const fStats = document.getElementById('frontStats') || createStatContainer('frontStats');
-            const bStats = document.getElementById('backStats') || createStatContainer('backStats');
 
             let fHtml = '', bHtml = '';
-            for (let i = 0; i < 35; i++) {
+            for (let i = 0; i < config.frontRange; i++) {
                 const c = numberStats.front[i];
                 fHtml += `<span class="stat-item${c===maxF&&c>0?' high':''}">${formatNumber(i+1)}: ${c}</span>`;
             }
-            for (let i = 0; i < 12; i++) {
+            for (let i = 0; i < config.backRange; i++) {
                 const c = numberStats.back[i];
                 bHtml += `<span class="stat-item${c===maxB&&c>0?' high':''}">${formatNumber(i+1)}: ${c}</span>`;
             }
 
             document.getElementById('statisticsContent').innerHTML = `
-                <div style="margin-bottom:20px;"><h4 style="color:#4a5568;margin-bottom:10px;">前区号码出现频率</h4><div class="number-stats">${fHtml}</div></div>
-                <div><h4 style="color:#4a5568;margin-bottom:10px;">后区号码出现频率</h4><div class="number-stats">${bHtml}</div></div>`;
+                <div style="margin-bottom:20px;"><h4 style="color:#4a5568;margin-bottom:10px;">${config.frontName}出现频率</h4><div class="number-stats">${fHtml}</div></div>
+                <div><h4 style="color:#4a5568;margin-bottom:10px;">${config.backName}出现频率</h4><div class="number-stats">${bHtml}</div></div>`;
         }
 
-        function createStatContainer(id) {
-            const d = document.createElement('div');
-            d.id = id;
-            d.className = 'number-stats';
-            return d;
-        }
-
-        // ---- 冷热分析功能 ----
+        // ========== 冷热分析 ==========
         function showHotColdAnalysis() {
             const el = document.getElementById('statisticsContent');
             el.style.display = 'block';
@@ -720,11 +842,13 @@
         function getHotColdData() {
             const fCounts = numberStats.front.map((c,i)=>({num:i+1,count:c})).sort((a,b)=>b.count-a.count);
             const bCounts = numberStats.back.map((c,i)=>({num:i+1,count:c})).sort((a,b)=>b.count-a.count);
+            const fHotN = Math.min(10, config.frontRange);
+            const bHotN = Math.min(5, config.backRange);
             return {
-                frontHot: fCounts.slice(0,10).map(x=>x.num),
-                frontCold: fCounts.slice(-10).reverse().map(x=>x.num),
-                backHot: bCounts.slice(0,5).map(x=>x.num),
-                backCold: bCounts.slice(-5).reverse().map(x=>x.num)
+                frontHot: fCounts.slice(0, fHotN).map(x=>x.num),
+                frontCold: fCounts.slice(-fHotN).reverse().map(x=>x.num),
+                backHot: bCounts.slice(0, bHotN).map(x=>x.num),
+                backCold: bCounts.slice(-bHotN).reverse().map(x=>x.num)
             };
         }
 
@@ -732,29 +856,32 @@
             const data = getHotColdData();
             const total = Math.max(...numberStats.front, ...numberStats.back) || 1;
 
-            const numTag = (num, count) =>
-                `<span class="hot-cold-num" style="opacity:${0.4 + (count/total)*0.6}">${formatNumber(num)}</span>`;
+            const numTag = (num, isFront) =>
+                `<span class="hot-cold-num" style="opacity:${0.4 + ((isFront?numberStats.front[num-1]:numberStats.back[num-1])/total)*0.6}">${formatNumber(num)}</span>`;
 
-            const makeCard = (title, nums, cls) => `
+            const makeCard = (title, nums, cls, isFront) => `
                 <div class="hot-cold-card ${cls}">
                     <h5>${title}</h5>
-                    <div class="hot-cold-numbers">${nums.map(n => numTag(n, numberStats[n<=35?'front':'back'][n-1])).join('')}</div>
+                    <div class="hot-cold-numbers">${nums.map(n => numTag(n, isFront)).join('')}</div>
                 </div>`;
 
+            const fHotN = Math.min(10, config.frontRange);
+            const bHotN = Math.min(5, config.backRange);
+
             document.getElementById('statisticsContent').innerHTML = `
-                <h4 style="color:#2d3748;margin-bottom:15px;">🔥 冷热号码分析（基于当前会话统计数据）</h4>
+                <h4 style="color:#2d3748;margin-bottom:15px;">🔥 冷热号码分析（${config.name} · 基于当前会话统计数据）</h4>
                 <div class="hot-cold-grid">
-                    ${makeCard('🔴 前区热门 TOP10', data.frontHot, 'hot-card-front')}
-                    ${makeCard('🔵 前区冷门 TOP10', data.frontCold, 'cold-card-front')}
-                    ${makeCard('🟣 后区热门 TOP5', data.backHot, 'hot-card-back')}
-                    ${makeCard('🟢 后区冷门 TOP5', data.backCold, 'cold-card-back')}
+                    ${makeCard(`🔴 ${config.frontName}热门 TOP${fHotN}`, data.frontHot, 'hot-card-front', true)}
+                    ${makeCard(`🔵 ${config.frontName}冷门 TOP${fHotN}`, data.frontCold, 'cold-card-front', true)}
+                    ${makeCard(`🟣 ${config.backName}热门 TOP${bHotN}`, data.backHot, 'hot-card-back', false)}
+                    ${makeCard(`🟢 ${config.backName}冷门 TOP${bHotN}`, data.backCold, 'cold-card-back', false)}
                 </div>
                 <div style="margin-top:15px;text-align:center;color:#888;font-size:13px;">
                     透明度越低 = 出现次数越少 | 透明度越高 = 出现次数越多
                 </div>`;
         }
 
-        // ---- 通知系统 ----
+        // ========== 通知系统 ==========
         function showNotification(msg, type) {
             const colors = { success:'linear-gradient(135deg,#11998e,#38ef7d)', error:'linear-gradient(135deg,#eb3349,#f45c43)', warning:'linear-gradient(135deg,#f093fb,#f5576c)' };
             const n = document.createElement('div');
@@ -775,6 +902,7 @@
             @keyframes slideOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:0}}`;
         document.head.appendChild(animStyle);
 
+        // ========== 页面初始化 ==========
         window.onload = () => {
             myNumbers = generateLotteryNumbers();
             updateDisplay();
