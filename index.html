@@ -193,6 +193,20 @@
         .hot-card-back { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
         .cold-card-back { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
 
+        .rules-list { display: flex; flex-direction: column; gap: 10px; }
+        .rule-item {
+            display: grid; grid-template-columns: 80px 160px 1fr; gap: 12px; align-items: center;
+            padding: 12px 15px; background: white; border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: all 0.2s ease; font-size: 13px;
+        }
+        .rule-item:hover { transform: translateX(3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .rule-level {
+            padding: 6px 12px; border-radius: 8px; color: white; font-weight: 700;
+            text-align: center; font-size: 13px; white-space: nowrap;
+        }
+        .rule-condition { color: #4a5568; font-weight: 600; font-family: 'Consolas','Monaco',monospace; font-size: 13px; }
+        .rule-desc { color: #718096; font-size: 12px; line-height: 1.5; }
+
         @media (max-width: 768px) {
             .container { padding: 25px; margin: 10px; }
             h1 { font-size: 2em; }
@@ -204,6 +218,7 @@
             .hot-cold-grid { grid-template-columns: 1fr; }
             .batch-result-item { grid-template-columns: 1fr; gap: 5px; }
             .type-switch { max-width: 100%; }
+            .rule-item { grid-template-columns: 1fr; gap: 5px; }
         }
     </style>
 </head>
@@ -229,6 +244,7 @@
                 <button onclick="toggleFilterSection()" style="background:linear-gradient(135deg, #f093fb 0%, #f5576c 100%);box-shadow:0 4px 15px rgba(240,147,252,0.4)">🔍 号码筛选</button>
                 <button onclick="showHistoryPanel()" style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);box-shadow:0 4px 15px rgba(102,126,234,0.4)">📜 查看历史</button>
                 <button onclick="showHotColdAnalysis()" style="background:linear-gradient(135deg, #11998e 0%, #38ef7d 100%);box-shadow:0 4px 15px rgba(17,153,142,0.4)">🔥 冷热分析</button>
+                <button onclick="showPrizeRules()" style="background:linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);box-shadow:0 4px 15px rgba(252,74,26,0.4)">📋 中奖规则</button>
             </div>
         </div>
 
@@ -255,6 +271,11 @@
                 <button onclick="clearHistory()" style="background:#eb3349;">🗑️ 清空历史</button>
             </div>
             <div id="historyContent" style="max-height:300px;overflow-y:auto;"></div>
+        </div>
+
+        <div class="section" id="rulesSection" style="display:none;">
+            <div class="section-title" id="rulesTitle">📋 中奖规则</div>
+            <div id="rulesContent"></div>
         </div>
 
         <div class="section" id="manualSection" style="display:none;">
@@ -332,13 +353,22 @@
                 frontPick: 5, backPick: 2,
                 maxExcludeFront: 30, maxExcludeBack: 10,
                 prizeRules: {
-                    '5,2':'一等奖','5,1':'二等奖','5,0':'三等奖',
-                    '4,2':'四等奖','4,1':'五等奖','3,2':'五等奖',
-                    '4,0':'六等奖','3,1':'六等奖','2,2':'六等奖',
-                    '3,0':'七等奖','2,1':'七等奖','1,2':'七等奖',
-                    '2,0':'八等奖','1,1':'八等奖','0,2':'八等奖',
-                    '1,0':'九等奖','0,1':'九等奖'
-                }
+                    '5,2':'一等奖','5,1':'二等奖',
+                    '5,0':'三等奖','4,2':'三等奖',
+                    '4,1':'四等奖','3,2':'四等奖',
+                    '4,0':'五等奖','3,1':'五等奖','2,2':'五等奖',
+                    '3,0':'六等奖','2,1':'六等奖','1,2':'六等奖','0,2':'六等奖',
+                    '2,0':'七等奖','1,1':'七等奖','0,1':'七等奖'
+                },
+                rulesDisplay: [
+                    { level:'一等奖', condition:'5+2', desc:'浮动奖，高等奖奖金78%+奖池，单注最高1000万元（基本投注），追加后最高可达1800万元' },
+                    { level:'二等奖', condition:'5+1', desc:'浮动奖，高等奖奖金22%，单注奖金随中奖注数浮动' },
+                    { level:'三等奖', condition:'5+0 或 4+2', desc:'固定奖，5000元；奖池≥8亿元时提升至6666元' },
+                    { level:'四等奖', condition:'4+1 或 3+2', desc:'固定奖，300元；奖池≥8亿元时提升至380元' },
+                    { level:'五等奖', condition:'4+0 或 3+1 或 2+2', desc:'固定奖，150元；奖池≥8亿元时提升至200元' },
+                    { level:'六等奖', condition:'3+0 或 2+1 或 1+2 或 0+2', desc:'固定奖，15元；奖池≥8亿元时提升至18元' },
+                    { level:'七等奖', condition:'2+0 或 1+1 或 0+1', desc:'固定奖，5元；奖池≥8亿元时提升至7元' }
+                ]
             },
             SSQ: {
                 name: '双色球',
@@ -348,11 +378,21 @@
                 maxExcludeFront: 27, maxExcludeBack: 15,
                 prizeRules: {
                     '6,1':'一等奖','6,0':'二等奖',
-                    '5,1':'三等奖','5,0':'四等奖',
-                    '4,1':'四等奖','4,0':'五等奖',
-                    '3,1':'五等奖','2,1':'六等奖',
-                    '1,1':'六等奖','0,1':'六等奖'
-                }
+                    '5,1':'三等奖',
+                    '5,0':'四等奖','4,1':'四等奖',
+                    '4,0':'五等奖','3,1':'五等奖',
+                    '2,1':'六等奖','1,1':'六等奖','0,1':'六等奖',
+                    '3,0':'福运奖'
+                },
+                rulesDisplay: [
+                    { level:'一等奖', condition:'6红+1蓝', desc:'投注号码与当期开奖号码全部相同，浮动奖，最高1000万元' },
+                    { level:'二等奖', condition:'6红+0蓝', desc:'6个红色球号码相同，浮动奖' },
+                    { level:'三等奖', condition:'5红+1蓝', desc:'任意5个红色球号码和1个蓝色球号码相同，固定奖3000元' },
+                    { level:'四等奖', condition:'5红+0蓝 或 4红+1蓝', desc:'固定奖200元' },
+                    { level:'五等奖', condition:'4红+0蓝 或 3红+1蓝', desc:'固定奖10元' },
+                    { level:'六等奖', condition:'2红+1蓝 或 1红+1蓝 或 0红+1蓝', desc:'固定奖5元' },
+                    { level:'福运奖', condition:'3红+0蓝', desc:'执行特别规定期间，任意3个红色球号码相同，固定奖5元' }
+                ]
             }
         };
 
@@ -476,7 +516,7 @@
         }
 
         function hideSections() {
-            ['manualSection','batchSection','filterSection','historySection'].forEach(id => {
+            ['manualSection','batchSection','filterSection','historySection','rulesSection'].forEach(id => {
                 document.getElementById(id).style.display = 'none';
             });
         }
@@ -879,6 +919,50 @@
                 <div style="margin-top:15px;text-align:center;color:#888;font-size:13px;">
                     透明度越低 = 出现次数越少 | 透明度越高 = 出现次数越多
                 </div>`;
+        }
+
+        // ========== 中奖规则展示 ==========
+        function showPrizeRules() {
+            const el = document.getElementById('rulesSection');
+            if (el.style.display === 'none' || !el.style.display) {
+                el.style.display = 'block';
+                renderPrizeRules();
+            } else {
+                el.style.display = 'none';
+            }
+        }
+
+        function renderPrizeRules() {
+            document.getElementById('rulesTitle').textContent = `📋 ${config.name}中奖规则`;
+            const rules = config.rulesDisplay;
+            const levelColors = {
+                '一等奖':'linear-gradient(135deg,#ff6b6b,#ee5a52)',
+                '二等奖':'linear-gradient(135deg,#f093fb,#f5576c)',
+                '三等奖':'linear-gradient(135deg,#fc4a1a,#f7b733)',
+                '四等奖':'linear-gradient(135deg,#667eea,#764ba2)',
+                '五等奖':'linear-gradient(135deg,#4facfe,#00f2fe)',
+                '六等奖':'linear-gradient(135deg,#11998e,#38ef7d)',
+                '七等奖':'linear-gradient(135deg,#a8a8a8,#888)',
+                '福运奖':'linear-gradient(135deg,#f7b733,#fc4a1a)'
+            };
+
+            let html = `<div style="margin-bottom:15px;padding:12px;background:#f0f4ff;border-radius:10px;font-size:13px;color:#4a5568;">
+                <strong>${config.name}玩法：</strong>从${config.frontRange}个${config.frontName}中选${config.frontPick}个 + 从${config.backRange}个${config.backName}中选${config.backPick}个
+            </div>`;
+            html += '<div class="rules-list">';
+
+            rules.forEach(r => {
+                const bg = levelColors[r.level] || 'linear-gradient(135deg,#999,#666)';
+                html += `
+                    <div class="rule-item">
+                        <span class="rule-level" style="background:${bg}">${r.level}</span>
+                        <span class="rule-condition">${r.condition}</span>
+                        <span class="rule-desc">${r.desc}</span>
+                    </div>`;
+            });
+
+            html += '</div>';
+            document.getElementById('rulesContent').innerHTML = html;
         }
 
         // ========== 通知系统 ==========
