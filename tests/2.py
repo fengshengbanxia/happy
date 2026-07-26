@@ -1,24 +1,21 @@
-from playwright.sync_api import sync_playwright
+import random
+# 前区
+nums =sorted( random.sample(range(1,36),5) )
+formatted = [f"{num:02}" for num in nums]
+result = " ".join(formatted)
+# 后区
+nums1 =sorted(random.sample(range(1,13),2))
+formatted1 = [f"{num:02}" for num in nums1]
+result1 = " ".join(formatted1)
 
-def test_browser():
-    with sync_playwright() as p:
-        # 启动浏览器
-        browser = p.chromium.launch(headless=False)  # headless=False 会显示浏览器窗口
-        page = browser.new_page()
-        
-        # 访问网页
-        page.goto("https://www.baidu.com")
-        
-        # 获取网页标题
-        title = page.title()
-        print(f"网页标题: {title}")
-        
-        # 截图
-        page.screenshot(path="test_screenshot.png")
-        print("截图已保存为 test_screenshot.png")
-        
-        # 关闭浏览器
-        browser.close()
 
-if __name__ == "__main__":
-    test_browser()
+
+# 5次输出
+for i in range(5):
+    front_nums =sorted( random.sample(range(1,36),5) )
+    back_nums =sorted(random.sample(range(1,13),2))
+    front_result = " ".join([f"{num:02}" for num in front_nums])
+    back_result = " ".join([f"{num:02}" for num in back_nums])
+    print(front_result+" + "+back_result)
+
+    
